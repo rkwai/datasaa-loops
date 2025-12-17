@@ -69,6 +69,7 @@ export interface ChannelMetricsRecord {
   highLtvCustomers: number
   highLtvShare: number
   netValue: number
+  avgLtv: number
   computedAt: string
   modelVersion: number
 }

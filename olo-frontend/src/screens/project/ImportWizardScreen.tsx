@@ -96,7 +96,8 @@ export function ImportWizardScreen() {
         <div>
           <h1>Import wizard</h1>
           <p className="page-description">
-            Worker-driven CSV ingestion with schema mapping, validation, and recompute orchestration.
+            Feed customers, transactions, channels, and spend so the compute engine can keep your LTV:CAC ratio honest.
+            Every import reruns the pipeline automatically.
           </p>
         </div>
         {status && <span className="pill">{status}</span>}

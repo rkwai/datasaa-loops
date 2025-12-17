@@ -5,13 +5,13 @@ import { metaDb, touchProject } from '../../db/metaDb'
 import { ProjectProvider } from '../../context/ProjectContext'
 
 const NAV_ITEMS = [
-  { to: 'dashboard', label: 'Segment dashboard' },
-  { to: 'import', label: 'Import wizard' },
-  { to: 'attribution', label: 'CAC attribution map' },
-  { to: 'plan', label: 'Spend reallocation plan' },
+  { to: 'dashboard', label: 'LTV ↔ CAC view' },
+  { to: 'import', label: 'Data intake' },
+  { to: 'attribution', label: 'LTV→CAC map' },
+  { to: 'plan', label: 'Spend plan' },
   { to: 'settings', label: 'Model settings' },
   { to: 'audit', label: 'Audit log' },
-  { to: 'export', label: 'Export & backups' },
+  { to: 'export', label: 'Exports' },
 ]
 
 export function ProjectShell() {

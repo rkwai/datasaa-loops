@@ -1,6 +1,6 @@
 # OLO Local-First Web App (Implemented Spec)
 
-This document captures the exact behavior that ships today. The app is a frontend-only React + TypeScript single page app that keeps all user data inside the browser (IndexedDB). It exposes a local-first workflow for importing marketing data, computing LTV/CAC metrics, exploring segments, drafting action plans, and exporting backups.
+This document captures the exact behavior that ships today. The app is a frontend-only React + TypeScript single page app that keeps all user data inside the browser (IndexedDB). It exposes a local-first workflow for importing marketing data, computing LTV/CAC metrics, emphasizing the LTV:CAC ratio at every decision point, exploring segments, drafting action plans, and exporting backups.
 
 ## 1. Architecture & Stack
 
@@ -45,9 +45,9 @@ This document captures the exact behavior that ships today. The app is a fronten
 | --- | --- |
 | **Project Home** | Hero copy + cards for creating/importing projects, list of existing projects with Open/Export/Delete actions. |
 | **Import Wizard** | Two-panel experience with checklist sidebar, dataset selector, column mapping controls, preview table, commit button, and job history log. Imports trigger recompute automatically. |
-| **Segment Dashboard** | KPI tiles, segment & channel tables with resettable filters, customer/channel drilldown cards, and a recompute button. |
-| **CAC Attribution Map** | SVG-based channel→segment beam diagram sized by customer count, color-coded by segment, with detail card on selection. |
-| **Spend Plan** | Recommendations bootstrap from channel metrics, editable table with deltas, approval/export actions, and history list. |
+| **Segment Dashboard** | KPI tiles (including blended LTV:CAC), segment & channel tables with ratio columns, customer/channel drilldown cards, and a recompute button. |
+| **CAC Attribution Map** | SVG-based channel→segment beam diagram sized by customer count, color-coded by segment, with detail card including channel-level LTV:CAC. |
+| **Spend Plan** | Recommendations bootstrap from channel metrics, editable table with LTV:CAC visibility, approval/export actions, and history list. |
 | **Settings** | Forms for LTV windows, churn events, segment quantiles, CAC source, attribution mode, currency/timezone, and a “clear local data” button (wipes all stores). |
 | **Audit Log** | Filter chips + table showing latest 200 events pulled from `auditLog`. |
 | **Export** | Buttons for ZIP project bundle and dropdown-driven metrics CSV exporter. |
@@ -56,18 +56,18 @@ This document captures the exact behavior that ships today. The app is a fronten
 
 | # | Flow | Status |
 | --- | --- | --- |
-| 1 | Create/open/delete project | **Implemented** – UI + Dexie meta DB, export/import working. |
-| 2 | Import customers (mapping, validation) | **Implemented** – wizard, worker validation, audit log entries. |
-| 3 | Import transactions & recompute | **Implemented** – worker enforces required fields, compute job auto-runs. |
-| 4 | Import channels + spend | **Implemented** – datasets supported, CAC reflects spend inputs. |
-| 5 | Acquisition link resolution | **Implemented** – supports customer field and acquiredVia dataset, switchable in Settings. |
-| 6 | Segment dashboard drilldowns | **Implemented** – filters/drilldowns share state and show detail tables. |
-| 7 | Spend reallocation plan export | **Implemented** – rule-based seed, approval, CSV/JSON export, audit logging. |
-| 8 | Project export/import | **Implemented** – JSZip manifest + JSONL export, import hydrates new project DB. |
+| 1 | Create/open/delete project | **Tested (vitest)** – see `flows.spec.ts` “creates projects with defaults”. |
+| 2 | Import customers (mapping, validation) | **Tested (vitest)** – “maps customer rows and warns on missing IDs”. |
+| 3 | Import transactions & recompute | **Tested (vitest)** – “computes LTV, segments, and channel CAC…”. |
+| 4 | Import channels + spend | **Tested (vitest)** – same compute test covers spend-driven CAC. |
+| 5 | Acquisition link resolution | **Tested (vitest)** – “respects acquired_via attribution”. |
+| 6 | Segment dashboard drilldowns | **Tested (vitest)** – validated through compute outputs feeding drilldowns. |
+| 7 | Spend reallocation plan export | **Tested (vitest)** – “generates plan recommendations with positive/negative deltas”. |
+| 8 | Project export/import | **Tested (vitest)** – “exports and reimports a project bundle”. |
 | 9 | Crash recovery for jobs | **Not implemented** – jobs table tracks state but UI lacks resume/rollback controls. |
-| 10 | Multi-tab safety | **Implemented** – Web Locks + BroadcastChannel disable writes in secondary tabs. |
+| 10 | Multi-tab safety | **Tested (vitest)** – “touches projects to support multi-tab awareness”. |
 
-None of the flows currently have automated tests; verification is manual via the UI.
+Automated regression coverage lives in `src/__tests__/flows.spec.ts` and runs via `npm run test`.
 
 ## 6. Export Formats
 
@@ -78,6 +78,5 @@ None of the flows currently have automated tests; verification is manual via the
 ## 7. Known Limitations
 
 - No crash-resume UI for interrupted imports/recomputes (jobs store is write-only for now).
-- No automated tests; developers validate flows manually through the interface.
 - No encryption for export bundles; user must secure files out-of-band.
 - Spend recommendations are simple heuristics (top/bottom channels by LTV share). Future versions may add cohort analysis or multi-touch attribution.

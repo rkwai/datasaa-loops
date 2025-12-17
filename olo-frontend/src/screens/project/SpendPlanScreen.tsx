@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { nanoid } from 'nanoid'
 import { useProjectContext } from '../../context/ProjectContext'
 import type { ActionPlanItem, ActionPlanRecord } from '../../db/types'
+import { generateRecommendations } from '../../utils/spendPlan'
 
 export function SpendPlanScreen() {
   const { db, projectId } = useProjectContext()
@@ -98,6 +99,14 @@ export function SpendPlanScreen() {
     setMessage(`Exported ${format.toUpperCase()} bundle`)
   }
 
+  const ratioByChannel = new Map(
+    channelMetrics.map((metric) => {
+      const avgLtv = Number.isFinite(metric.avgLtv) ? metric.avgLtv : 0
+      const cac = Number.isFinite(metric.cac) ? metric.cac : 0
+      return [metric.channelId, cac > 0 ? avgLtv / cac : 0]
+    }),
+  )
+
   return (
     <div>
       <div className="page-header">
@@ -106,6 +115,9 @@ export function SpendPlanScreen() {
           <p className="page-description">
             Generate rule-based guidance, fine-tune line items, and export a fully-audited plan for
             manual execution.
+          </p>
+          <p className="page-description">
+            Use the LTV:CAC column to ensure budget shifts keep you above target ratio thresholds.
           </p>
         </div>
         {message && <span className="pill">{message}</span>}
@@ -123,6 +135,7 @@ export function SpendPlanScreen() {
               <thead>
                 <tr>
                   <th>Channel</th>
+                  <th>Current ratio</th>
                   <th>Current spend</th>
                   <th>Proposed spend</th>
                   <th>Delta</th>
@@ -130,10 +143,16 @@ export function SpendPlanScreen() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((item, idx) => (
-                  <tr key={item.channelId}>
-                    <td>{item.channelId}</td>
-                    <td>{item.currentSpend.toFixed(2)}</td>
+                {items.map((item, idx) => {
+                  const ratio = ratioByChannel.get(item.channelId) ?? 0
+                  return (
+                    <tr key={item.channelId}>
+                      <td>{item.channelId}</td>
+                      <td>
+                        {Number.isFinite(ratio) ? ratio.toFixed(2) : '—'}{' '}
+                        {ratio >= 3 && <span className="badge">On target</span>}
+                      </td>
+                      <td>{item.currentSpend.toFixed(2)}</td>
                     <td>
                       <input
                         type="number"
@@ -151,8 +170,9 @@ export function SpendPlanScreen() {
                     </td>
                     <td>{item.delta.toFixed(2)}</td>
                     <td>{item.rationale}</td>
-                  </tr>
-                ))}
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -205,38 +225,4 @@ export function SpendPlanScreen() {
       </div>
     </div>
   )
-}
-
-function generateRecommendations(channelMetrics: { channelId: string; cac: number; highLtvShare: number; spend: number }[]) {
-  if (!channelMetrics.length) return [] as ActionPlanItem[]
-  const sorted = [...channelMetrics].sort(
-    (a, b) => b.highLtvShare - a.highLtvShare || a.cac - b.cac,
-  )
-  const best = sorted.slice(0, Math.min(3, sorted.length))
-  const worst = sorted.slice(-Math.min(3, sorted.length))
-  const shiftBudget = sorted.reduce((sum, item) => sum + item.spend, 0) * 0.1
-  const perIncrease = best.length ? shiftBudget / best.length : 0
-  const perDecrease = worst.length ? shiftBudget / worst.length : 0
-
-  const items: ActionPlanItem[] = sorted.map((channel) => ({
-    channelId: channel.channelId,
-    currentSpend: channel.spend,
-    proposedSpend: channel.spend,
-    delta: 0,
-    rationale: channel.highLtvShare > 0.5 ? 'High HIGH-LTV share' : 'Monitor',
-  }))
-
-  items.forEach((item) => {
-    if (best.find((c) => c.channelId === item.channelId)) {
-      item.proposedSpend = item.currentSpend + perIncrease
-      item.delta = perIncrease
-      item.rationale = 'Increase allocation to best-performing HIGH segment sources'
-    } else if (worst.find((c) => c.channelId === item.channelId)) {
-      item.proposedSpend = Math.max(0, item.currentSpend - perDecrease)
-      item.delta = -perDecrease
-      item.rationale = 'Decrease due to low HIGH-LTV share or high CAC'
-    }
-  })
-
-  return items
 }

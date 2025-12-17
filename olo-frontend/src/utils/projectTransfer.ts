@@ -47,8 +47,9 @@ export async function exportProjectBundle(projectId: string) {
   return zip.generateAsync({ type: 'blob', compression: 'DEFLATE' })
 }
 
-export async function importProjectBundle(file: File) {
-  const zip = await JSZip.loadAsync(file)
+export async function importProjectBundle(file: Blob) {
+  const zipSource = await file.arrayBuffer()
+  const zip = await JSZip.loadAsync(zipSource)
   const manifestEntry = zip.file('manifest.json')
   if (!manifestEntry) {
     throw new Error('Invalid bundle: manifest missing')

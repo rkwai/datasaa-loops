@@ -11,10 +11,24 @@ export function SegmentDashboard() {
   const channelMetrics = useLiveQuery(() => db.channelMetrics.toArray(), [db]) ?? []
   const totalCustomers = segmentMetrics.reduce((sum, seg) => sum + seg.customerCount, 0)
   const totalRevenue = segmentMetrics.reduce((sum, seg) => sum + seg.totalRevenue, 0)
+  const totalSpend = channelMetrics.reduce((sum, channel) => sum + channel.spend, 0)
+  const ltvToCacRatio = totalSpend > 0 ? totalRevenue / totalSpend : 0
   const avgLtv = totalCustomers ? totalRevenue / totalCustomers : 0
   const topSegment = [...segmentMetrics].sort((a, b) => b.avgLtv - a.avgLtv)[0]
   const [selectedSegment, setSelectedSegment] = useState<SegmentKey | 'ALL'>('ALL')
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null)
+  const channelRatios = channelMetrics.map((channel) => {
+    const avgLtv = Number.isFinite(channel.avgLtv) ? channel.avgLtv : 0
+    const cac = Number.isFinite(channel.cac) ? channel.cac : 0
+    return {
+      ...channel,
+      avgLtv,
+      ratio: cac > 0 ? avgLtv / cac : 0,
+    }
+  })
+  const healthiestChannel = channelRatios.length
+    ? channelRatios.slice().sort((a, b) => b.ratio - a.ratio)[0]
+    : null
 
   const drilldownCustomers = useLiveQuery(async () => {
     if (!selectedSegment || selectedSegment === 'ALL') return []
@@ -105,6 +119,15 @@ export function SegmentDashboard() {
             {topSegment ? `${Math.round(topSegment.avgLtv)} avg LTV` : 'Import data to begin'}
           </span>
         </div>
+        <div className="stat-card" style={{ background: 'linear-gradient(135deg,#ecfccb,#fff)' }}>
+          <h3>LTV : CAC ratio</h3>
+          <strong>{Number.isFinite(ltvToCacRatio) ? ltvToCacRatio.toFixed(2) : '—'}</strong>
+          <span className="page-description">
+            {totalSpend > 0
+              ? `Revenue ${meta.currency} ${totalRevenue.toFixed(0)} vs spend ${totalSpend.toFixed(0)}`
+              : 'Import spend data to unlock CAC insights'}
+          </span>
+        </div>
       </div>
 
       <div className="split">
@@ -115,13 +138,16 @@ export function SegmentDashboard() {
               Reset
             </button>
           </div>
-          <p className="page-description">Click a segment to drill into customer-level context.</p>
+          <p className="page-description">
+            Click a segment to drill into customer-level context. Keep the blended ratio north of 3:1 for healthy payback.
+          </p>
           <table className="table" style={{ marginTop: '1rem' }}>
             <thead>
               <tr>
                 <th>Segment</th>
                 <th>Customers</th>
                 <th>Avg LTV</th>
+                <th>LTV:CAC*</th>
                 <th>Revenue</th>
               </tr>
             </thead>
@@ -139,6 +165,11 @@ export function SegmentDashboard() {
                   </td>
                   <td>{segment.customerCount.toLocaleString()}</td>
                   <td>{segment.avgLtv.toFixed(0)}</td>
+                  <td>
+                    {totalSpend > 0 && totalCustomers > 0
+                      ? (segment.avgLtv / (totalSpend / totalCustomers)).toFixed(2)
+                      : '—'}
+                  </td>
                   <td>{segment.totalRevenue.toFixed(0)}</td>
                 </tr>
               ))}
@@ -147,7 +178,14 @@ export function SegmentDashboard() {
         </div>
         <div className="surface">
           <div className="page-header" style={{ marginBottom: '0.75rem' }}>
-            <h3 className="section-title">Channel performance</h3>
+            <div>
+              <h3 className="section-title">Channel performance</h3>
+              {healthiestChannel && (
+                <p className="page-description" style={{ margin: 0 }}>
+                  Best ratio: {healthiestChannel.channelId} ({healthiestChannel.ratio.toFixed(2)}x)
+                </p>
+              )}
+            </div>
             <button className="ghost" type="button" onClick={() => setSelectedChannel(null)}>
               Reset
             </button>
@@ -159,12 +197,13 @@ export function SegmentDashboard() {
                 <tr>
                   <th>Channel</th>
                   <th>CAC</th>
-                  <th>Acquired</th>
+                  <th>Avg LTV</th>
+                  <th>LTV:CAC</th>
                   <th>High-LTV share</th>
                 </tr>
               </thead>
               <tbody>
-                {channelMetrics.map((channel) => (
+                {channelRatios.map((channel) => (
                   <tr key={channel.channelId}>
                     <td>
                       <button
@@ -176,7 +215,11 @@ export function SegmentDashboard() {
                       </button>
                     </td>
                     <td>{channel.cac.toFixed(2)}</td>
-                    <td>{channel.acquiredCustomers}</td>
+                    <td>{channel.avgLtv.toFixed(2)}</td>
+                    <td>
+                      {Number.isFinite(channel.ratio) ? channel.ratio.toFixed(2) : '—'}{' '}
+                      {channel.ratio >= 3 && <span className="badge">Target</span>}
+                    </td>
                     <td>{(channel.highLtvShare * 100).toFixed(1)}%</td>
                   </tr>
                 ))}
@@ -249,6 +292,9 @@ export function SegmentDashboard() {
           )}
         </div>
       </div>
+      <p className="page-description" style={{ marginTop: '0.75rem' }}>
+        *Segment avg LTV divided by blended CAC (total spend ÷ total customers)
+      </p>
     </div>
   )
 }

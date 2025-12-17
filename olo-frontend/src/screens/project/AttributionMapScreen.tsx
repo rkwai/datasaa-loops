@@ -80,7 +80,7 @@ export function AttributionMapScreen() {
           <h1>Dynamic CAC attribution map</h1>
           <p className="page-description">
             Explore first-touch links between acquisition sources and LTV segments. Thicker beams
-            indicate more customers.
+            indicate more customers, color indicates segment, and the detail panel shows the resulting LTV:CAC ratio.
           </p>
         </div>
       </div>
@@ -151,6 +151,16 @@ export function AttributionMapScreen() {
             <div className="stat-card">
               <h3>Average LTV</h3>
               <strong>{selectedEdge.avgLtv.toFixed(2)}</strong>
+            </div>
+            <div className="stat-card">
+              <h3>LTV:CAC</h3>
+              <strong>
+                {(() => {
+                  const metric = channelMetrics.find((c) => c.channelId === selectedEdge.channelId)
+                  if (!metric || metric.cac === 0) return '—'
+                  return (metric.avgLtv / metric.cac).toFixed(2)
+                })()}
+              </strong>
             </div>
           </div>
         </div>

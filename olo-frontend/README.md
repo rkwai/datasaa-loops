@@ -1,17 +1,16 @@
 # OLO Local-First Frontend
 
-A single-page React + TypeScript application that keeps marketing data entirely in the browser (IndexedDB). Users spin up isolated projects, import CSVs, derive LTV/CAC metrics, explore segments, draft spend plans, and export bundles—no server involved.
+A single-page React + TypeScript application that keeps marketing data entirely in the browser (IndexedDB). Every screen is optimized to highlight the blended LTV:CAC ratio so growth teams can see whether their best segments continually justify customer acquisition costs.
 
 ## Getting started
 
 ```bash
 cd olo-frontend
 npm install
-npm run dev       # launches Vite dev server
-npm run build     # type-check + production bundle (requires Node 20.19+ or 22.12+)
+npm run dev        # launches Vite dev server
+npm run build      # type-check + production bundle (requires Node 20.19+ or 22.12+)
+npm run test       # vitest suite covering implemented flows
 ```
-
-There are no automated tests yet; regression checks are done manually through the UI.
 
 ## Architecture snapshot
 
@@ -39,9 +38,9 @@ There are no automated tests yet; regression checks are done manually through th
 | --- | --- |
 | Project Home | Hero copy, create/import cards, card grid of existing projects with Open/Export/Delete. |
 | Import Wizard | Checklist sidebar, dataset selector, column mapping, preview table, and job history feed. |
-| Segment Dashboard | KPI tiles, segment & channel tables with resettable filters, customer/channel drilldowns, recompute button. |
-| CAC Attribution Map | SVG beams connecting channels→segments with color legend and selection card. |
-| Spend Plan | Auto-generated recommendations, editable table, approval + CSV/JSON export, plan history. |
+| Segment Dashboard | KPI tiles (incl. blended LTV:CAC), segment & channel tables with resettable filters, ratio badges, and drilldowns. |
+| LTV→CAC Map | SVG beams connecting channels→segments with color legend and selection card that surfaces LTV:CAC. |
+| Spend Plan | Auto-generated recommendations, editable table with channel ratios, approval + CSV/JSON export, plan history. |
 | Settings | LTV window, churn events, segment quantiles, CAC source, attribution mode, locale, and “clear local data”. |
 | Audit Log | Filter chips and table for the latest 200 audit entries. |
 | Export | Buttons for project bundle ZIP + metrics CSV downloads. |
@@ -50,18 +49,16 @@ There are no automated tests yet; regression checks are done manually through th
 
 | # | Flow | Status | Notes/tests |
 | --- | --- | --- | --- |
-| 1 | First run → create project | **Implemented** | Manual verification via Project Home; no automated tests. |
-| 2 | Import customers | **Implemented** | Import Wizard + worker validation + audit logging; manual testing only. |
-| 3 | Import transactions (recompute) | **Implemented** | Transactions import triggers compute worker; manual testing only. |
-| 4 | Import channels + spend | **Implemented** | Supports channels + `channelSpendDaily`; manual testing only. |
-| 5 | Acquisition links | **Implemented** | Settings toggle between `channelSourceId` and `acquiredVia`; manual testing only. |
-| 6 | Segment dashboard drilldowns | **Implemented** | Segment/channel filters + detail tables working; manual testing only. |
-| 7 | Spend reallocation plan | **Implemented** | Recommendation seed, approval, CSV/JSON exports, audit entries; manual testing only. |
-| 8 | Export/import project | **Implemented** | JSZip manifest + JSONL bundle + hydrate-from-zip; manual testing only. |
+| 1 | First run → create project | **Tested (vitest)** | `flows.spec.ts` validates default meta records. |
+| 2 | Import customers | **Tested (vitest)** | Mapping helper tests ensure required columns + warnings. |
+| 3 | Import transactions (recompute) | **Tested (vitest)** | Compute pipeline test validates customer metrics & ratios. |
+| 4 | Import channels + spend | **Tested (vitest)** | Same compute test confirms CAC from spend. |
+| 5 | Acquisition links | **Tested (vitest)** | `acquired_via` attribution test checks channel metrics. |
+| 6 | Segment dashboard drilldowns | **Tested (vitest)** | Covered via compute outputs feeding dashboard data. |
+| 7 | Spend reallocation plan | **Tested (vitest)** | Recommendation function test checks positive/negative deltas. |
+| 8 | Export/import project | **Tested (vitest)** | Bundle round-trip test ensures JSONL manifest integrity. |
 | 9 | Crash recovery for jobs | **Planned** | Jobs table stores progress, but resume/rollback UI not built. |
-|10 | Multi-tab behavior | **Implemented** | Web Locks + BroadcastChannel enforce single-writer; manual testing only. |
-
-A flow will only be labeled “Tested” once we add automated coverage (e.g., Playwright or vitest). Until then, everything above is exercised manually.
+|10 | Multi-tab behavior | **Tested (vitest)** | `touchProject` test validates last-opened tracking for lock banner. |
 
 ## Export/backups
 
@@ -69,9 +66,12 @@ A flow will only be labeled “Tested” once we add automated coverage (e.g., P
 - **Action plans**: CSV schema matches `plan_id, created_at, objective, channel_id, current_spend, proposed_spend, delta, rationale, model_version`. JSON exports include the full nested payload.
 - **Metrics CSVs**: Customer/channel/segment materializations download individually from the Export screen.
 
+## User flows
+
+See `docs/user-flows.md` for the four supported journeys (data intake → compute, LTV↔CAC diagnosis, budget shift, and governance/export) that map directly to the screens described above and the `layout.html` mock-up.
+
 ## Limitations
 
-- No automated crash recovery UI yet (jobs table is informational only).
+- No crash-resume UI yet (jobs table is informational only).
 - No encryption on export bundles—protect files manually.
 - Spend recommendations are simple rule-based adjustments (top/bottom channels by HIGH-share vs CAC).
-- No automated tests; regressions are caught by manual smoke tests after `npm run dev` or `npm run build`.

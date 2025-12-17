@@ -71,14 +71,14 @@ export function ProjectHome() {
       <section className="hero-card">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <span className="pill" style={{ color: '#cbd5f5' }}>
-            Local-first workspace
+            Local-first LTV ↔ CAC lab
           </span>
           <h1 style={{ margin: 0, fontSize: '2.5rem' }}>
             Operational Loop Optimizer
           </h1>
           <p style={{ margin: 0, maxWidth: 640, color: '#c3cee7' }}>
-            Spin up isolated projects, import sensitive performance data, and keep LTV/CAC
-            modeling entirely on-device. Export backups whenever you need to hop machines.
+            Import campaign, customer, and spend data without leaving the browser, then watch your LTV:CAC
+            ratio respond as you experiment with segments and spend plans.
           </p>
         </div>
       </section>

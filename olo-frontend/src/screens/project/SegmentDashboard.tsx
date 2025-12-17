@@ -119,7 +119,11 @@ export function SegmentDashboard() {
             {topSegment ? `${Math.round(topSegment.avgLtv)} avg LTV` : 'Import data to begin'}
           </span>
         </div>
-        <div className="stat-card" style={{ background: 'linear-gradient(135deg,#ecfccb,#fff)' }}>
+        <div
+          className="stat-card"
+          data-testid="kpi-ltv-cac"
+          style={{ background: 'linear-gradient(135deg,#ecfccb,#fff)' }}
+        >
           <h3>LTV : CAC ratio</h3>
           <strong>{Number.isFinite(ltvToCacRatio) ? ltvToCacRatio.toFixed(2) : '—'}</strong>
           <span className="page-description">

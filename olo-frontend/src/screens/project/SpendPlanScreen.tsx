@@ -155,6 +155,7 @@ export function SpendPlanScreen() {
                       <td>{item.currentSpend.toFixed(2)}</td>
                     <td>
                       <input
+                        data-testid={`spend-input-${item.channelId}`}
                         type="number"
                         value={item.proposedSpend}
                         onChange={(e) => {
@@ -187,7 +188,12 @@ export function SpendPlanScreen() {
             </div>
           </div>
           <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button type="button" onClick={handleApprove} disabled={!items.length}>
+            <button
+              type="button"
+              data-testid="approve-plan"
+              onClick={handleApprove}
+              disabled={!items.length}
+            >
               Approve plan
             </button>
             <button type="button" className="secondary" onClick={() => handleExport('csv')}>

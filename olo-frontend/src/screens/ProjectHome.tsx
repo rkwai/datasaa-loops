@@ -91,20 +91,29 @@ export function ProjectHome() {
           </p>
           <form className="split" onSubmit={handleCreate} style={{ marginTop: '1rem' }}>
             <div>
-              <label>Project name</label>
+              <label htmlFor="project-name-input">Project name</label>
               <input
+                id="project-name-input"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Q1 North America"
               />
             </div>
             <div>
-              <label>Currency</label>
-              <input value={currency} onChange={(e) => setCurrency(e.target.value)} />
+              <label htmlFor="project-currency-input">Currency</label>
+              <input
+                id="project-currency-input"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+              />
             </div>
             <div>
-              <label>Timezone</label>
-              <input value={timezone} onChange={(e) => setTimezone(e.target.value)} />
+              <label htmlFor="project-timezone-input">Timezone</label>
+              <input
+                id="project-timezone-input"
+                value={timezone}
+                onChange={(e) => setTimezone(e.target.value)}
+              />
             </div>
             <div style={{ alignSelf: 'end', display: 'flex', justifyContent: 'flex-end' }}>
               <button type="submit" disabled={submitting}>
@@ -122,7 +131,9 @@ export function ProjectHome() {
             reuse the saved model config.
           </p>
           <div style={{ marginTop: '1rem' }}>
+            <label htmlFor="project-import-input">Import .zip</label>
             <input
+              id="project-import-input"
               ref={fileInputRef}
               type="file"
               accept="application/zip"

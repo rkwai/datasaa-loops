@@ -95,7 +95,12 @@ export function ProjectShell() {
             </div>
             <nav className="nav-section">
               {NAV_ITEMS.map((item) => (
-                <NavLink key={item.to} className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to={item.to}>
+                <NavLink
+                  key={item.to}
+                  data-testid={`nav-${item.to}`}
+                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                  to={`/project/${projectId}/${item.to}`}
+                >
                   {item.label}
                 </NavLink>
               ))}

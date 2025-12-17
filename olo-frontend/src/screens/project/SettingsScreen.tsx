@@ -92,8 +92,9 @@ export function SettingsScreen() {
         <h3 style={{ marginTop: 0 }}>LTV + churn</h3>
         <div className="split">
           <div>
-            <label>LTV window (days)</label>
+            <label htmlFor="settings-ltv-window">LTV window (days)</label>
             <input
+              id="settings-ltv-window"
               type="number"
               value={ltvWindowDays}
               placeholder="All time"
@@ -101,8 +102,12 @@ export function SettingsScreen() {
             />
           </div>
           <div>
-            <label>Churn event types (comma separated)</label>
-            <input value={churnEvents} onChange={(e) => setChurnEvents(e.target.value)} />
+            <label htmlFor="settings-churn-events">Churn event types (comma separated)</label>
+            <input
+              id="settings-churn-events"
+              value={churnEvents}
+              onChange={(e) => setChurnEvents(e.target.value)}
+            />
           </div>
         </div>
 
@@ -111,12 +116,20 @@ export function SettingsScreen() {
         </h3>
         <div className="split">
           <div>
-            <label>Segment high quantile</label>
-            <input value={segmentHigh} onChange={(e) => setSegmentHigh(e.target.value)} />
+            <label htmlFor="settings-segment-high">Segment high quantile</label>
+            <input
+              id="settings-segment-high"
+              value={segmentHigh}
+              onChange={(e) => setSegmentHigh(e.target.value)}
+            />
           </div>
           <div>
-            <label>Segment mid quantile</label>
-            <input value={segmentMid} onChange={(e) => setSegmentMid(e.target.value)} />
+            <label htmlFor="settings-segment-mid">Segment mid quantile</label>
+            <input
+              id="settings-segment-mid"
+              value={segmentMid}
+              onChange={(e) => setSegmentMid(e.target.value)}
+            />
           </div>
         </div>
 
@@ -125,15 +138,23 @@ export function SettingsScreen() {
         </h3>
         <div className="split">
           <div>
-            <label>CAC spend source</label>
-            <select value={cacSource} onChange={(e) => setCacSource(e.target.value as any)}>
+            <label htmlFor="settings-cac-source">CAC spend source</label>
+            <select
+              id="settings-cac-source"
+              value={cacSource}
+              onChange={(e) => setCacSource(e.target.value as any)}
+            >
               <option value="daily">Daily spend table</option>
               <option value="channel_total">Channel total budget</option>
             </select>
           </div>
           <div>
-            <label>Attribution mode</label>
-            <select value={attribution} onChange={(e) => setAttribution(e.target.value as any)}>
+            <label htmlFor="settings-attribution">Attribution mode</label>
+            <select
+              id="settings-attribution"
+              value={attribution}
+              onChange={(e) => setAttribution(e.target.value as any)}
+            >
               <option value="channel_field">Customer.channelSourceId</option>
               <option value="acquired_via">Acquired_Via edges</option>
             </select>
@@ -145,12 +166,20 @@ export function SettingsScreen() {
         </h3>
         <div className="split">
           <div>
-            <label>Currency</label>
-            <input value={currency} onChange={(e) => setCurrency(e.target.value)} />
+            <label htmlFor="settings-currency">Currency</label>
+            <input
+              id="settings-currency"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+            />
           </div>
           <div>
-            <label>Timezone</label>
-            <input value={timezone} onChange={(e) => setTimezone(e.target.value)} />
+            <label htmlFor="settings-timezone">Timezone</label>
+            <input
+              id="settings-timezone"
+              value={timezone}
+              onChange={(e) => setTimezone(e.target.value)}
+            />
           </div>
         </div>
 

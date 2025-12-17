@@ -100,7 +100,11 @@ export function ImportWizardScreen() {
             Every import reruns the pipeline automatically.
           </p>
         </div>
-        {status && <span className="pill">{status}</span>}
+        {status && (
+          <span className="pill" data-testid="import-status">
+            {status}
+          </span>
+        )}
       </div>
 
       <div className="wizard-layout">
@@ -132,8 +136,10 @@ export function ImportWizardScreen() {
         <form className="wizard-panel" onSubmit={handleSubmit}>
           <div className="split">
             <div>
-              <label>Dataset</label>
+              <label htmlFor="dataset-select">Dataset</label>
               <select
+                id="dataset-select"
+                data-testid="dataset-select"
                 value={dataset}
                 onChange={(e) => {
                   const value = e.target.value as DatasetType
@@ -153,8 +159,14 @@ export function ImportWizardScreen() {
               <p className="page-description">{schema.description}</p>
             </div>
             <div>
-              <label>Upload CSV</label>
-              <input type="file" accept="text/csv" onChange={(e) => handleFileChange(e.target.files?.[0])} />
+              <label htmlFor="dataset-file-input">Upload CSV</label>
+              <input
+                id="dataset-file-input"
+                data-testid="dataset-file-input"
+                type="file"
+                accept="text/csv"
+                onChange={(e) => handleFileChange(e.target.files?.[0])}
+              />
               <p className="page-description">Streaming parse—no file ever leaves the browser.</p>
             </div>
           </div>
@@ -215,7 +227,7 @@ export function ImportWizardScreen() {
           )}
 
           <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            <button type="submit" disabled={isRunning}>
+            <button type="submit" data-testid="import-submit" disabled={isRunning}>
               Commit import
             </button>
             {status && <span className="page-description">{status}</span>}

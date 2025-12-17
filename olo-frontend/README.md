@@ -9,7 +9,10 @@ cd olo-frontend
 npm install
 npm run dev        # launches Vite dev server
 npm run build      # type-check + production bundle (requires Node 20.19+ or 22.12+)
-npm run test       # vitest suite covering implemented flows
+npm run test       # vitest suite covering Dexie/worker logic
+# one-time setup for e2e
+npx playwright install chromium
+npm run test:e2e   # Playwright user-flow coverage (needs ability to start a local dev server)
 ```
 
 ## Architecture snapshot
@@ -49,14 +52,14 @@ npm run test       # vitest suite covering implemented flows
 
 | # | Flow | Status | Notes/tests |
 | --- | --- | --- | --- |
-| 1 | First run → create project | **Tested (vitest)** | `flows.spec.ts` validates default meta records. |
-| 2 | Import customers | **Tested (vitest)** | Mapping helper tests ensure required columns + warnings. |
-| 3 | Import transactions (recompute) | **Tested (vitest)** | Compute pipeline test validates customer metrics & ratios. |
-| 4 | Import channels + spend | **Tested (vitest)** | Same compute test confirms CAC from spend. |
-| 5 | Acquisition links | **Tested (vitest)** | `acquired_via` attribution test checks channel metrics. |
-| 6 | Segment dashboard drilldowns | **Tested (vitest)** | Covered via compute outputs feeding dashboard data. |
-| 7 | Spend reallocation plan | **Tested (vitest)** | Recommendation function test checks positive/negative deltas. |
-| 8 | Export/import project | **Tested (vitest)** | Bundle round-trip test ensures JSONL manifest integrity. |
+| 1 | First run → create project | **Tested (vitest + Playwright)** | `flows.spec.ts` (unit) + `tests-e2e/flows.spec.ts` (UI). |
+| 2 | Import customers | **Tested (vitest + Playwright)** | Helper tests + UI walk-through. |
+| 3 | Import transactions (recompute) | **Tested (vitest + Playwright)** | Compute pipeline unit test + UI confirmation. |
+| 4 | Import channels + spend | **Tested (vitest + Playwright)** | Unit test ensures CAC math, e2e imports CSVs. |
+| 5 | Acquisition links | **Tested (vitest)** | `acquired_via` unit test checks metrics. |
+| 6 | Segment dashboard drilldowns | **Tested (vitest + Playwright)** | Unit test covers metrics; e2e verifies UI ratios. |
+| 7 | Spend reallocation plan | **Tested (vitest + Playwright)** | Recommendation unit test + UI approval/export. |
+| 8 | Export/import project | **Tested (vitest + Playwright)** | Bundle round-trip + UI export trigger. |
 | 9 | Crash recovery for jobs | **Planned** | Jobs table stores progress, but resume/rollback UI not built. |
 |10 | Multi-tab behavior | **Tested (vitest)** | `touchProject` test validates last-opened tracking for lock banner. |
 

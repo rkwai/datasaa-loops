@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Import Wizard - Upload CSVs</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00d68f","primary-hover": "#05c484",
+                        "header-bg": "#131b2b","background-light": "#f8fafc","background-dark": "#0f172a",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem", 
+                        "lg": "0.75rem", 
+                        "xl": "1rem", 
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display text-slate-900 dark:text-white transition-colors duration-200">
+<header class="w-full px-6 py-6 md:px-12 flex justify-center bg-header-bg border-b border-slate-800 shadow-md relative z-20">
+<div class="max-w-5xl w-full">
+<nav class="flex flex-wrap items-center gap-4 text-sm md:text-base">
+<div class="flex items-center gap-3 text-white font-bold">
+<span class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-slate-900 text-sm shadow-[0_0_10px_rgba(0,214,143,0.4)]">1</span>
+                    Upload
+                </div>
+<div class="h-px w-8 bg-slate-700"></div>
+<div class="flex items-center gap-3 text-slate-400 font-medium">
+<span class="flex items-center justify-center w-8 h-8 rounded-lg border border-slate-600 bg-slate-800/50 text-slate-400 text-sm">2</span>
+                    Map Columns
+                </div>
+<div class="h-px w-8 bg-slate-700"></div>
+<div class="flex items-center gap-3 text-slate-400 font-medium">
+<span class="flex items-center justify-center w-8 h-8 rounded-lg border border-slate-600 bg-slate-800/50 text-slate-400 text-sm">3</span>
+                    Review
+                </div>
+</nav>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center px-6 md:px-12 py-12 relative z-10">
+<div class="max-w-4xl w-full flex flex-col gap-10">
+<div class="flex flex-col gap-4 text-center items-center">
+<h1 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+                    Let's get your data in.
+                </h1>
+<p class="text-lg text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+                    Upload your customer, transaction, or campaign data to start the analysis loop. 
+                    We'll analyze it locally on your machine.
+                </p>
+</div>
+<div class="relative group cursor-pointer w-full">
+<div class="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-blue-500/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-700"></div>
+<div class="relative bg-surface-light dark:bg-surface-dark border-2 border-dashed border-slate-200 dark:border-slate-700 group-hover:border-primary dark:group-hover:border-primary group-hover:bg-slate-50 dark:group-hover:bg-slate-800/80 rounded-xl p-12 md:p-16 flex flex-col items-center justify-center gap-8 transition-all duration-300 shadow-soft">
+<div class="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary transform group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">
+                            cloud_upload
+                        </span>
+</div>
+<div class="text-center space-y-3 max-w-lg">
+<h3 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
+                            Drag &amp; Drop your CSV here
+                        </h3>
+<p class="text-slate-500 dark:text-slate-400">
+                            or browse to upload from your computer. <br class="hidden sm:block"/>
+                            Support for .csv, .xls, .xlsx files up to 50MB.
+                        </p>
+</div>
+<button class="bg-primary hover:bg-primary-hover text-slate-900 font-bold h-12 px-8 rounded-lg flex items-center gap-2 transition-all active:scale-95 shadow-md shadow-emerald-500/20">
+<span class="material-symbols-outlined text-xl">folder_open</span>
+                        Select CSV File
+                    </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-soft">
+<div class="flex flex-col gap-1">
+<h4 class="font-bold text-slate-900 dark:text-white text-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400">table_chart</span>
+                            Formatting help?
+                        </h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">
+                            Download our sample template.
+                        </p>
+</div>
+<button class="text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 h-10 px-5 rounded-lg whitespace-nowrap transition-colors">
+                        Download Template
+                    </button>
+</div>
+<div class="bg-primary/5 rounded-xl p-6 border border-primary/10 flex flex-col justify-center gap-2 shadow-sm">
+<div class="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-sm uppercase tracking-wider">
+<span class="material-symbols-outlined text-lg">lightbulb</span>
+                        Quick Tip
+                    </div>
+<p class="text-sm text-slate-700 dark:text-slate-300">
+                        Ensure your CSV has a header row. We'll automatically detect column names in the next step.
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<footer class="sticky bottom-0 z-50 w-full bg-surface-light/90 dark:bg-surface-dark/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-4 px-6 md:px-12">
+<div class="max-w-5xl mx-auto flex justify-between items-center">
+<button class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white font-medium text-sm px-4 py-2 rounded-lg transition-colors">
+                Cancel
+            </button>
+<div class="flex gap-4">
+<button class="opacity-60 cursor-not-allowed bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 font-bold h-12 px-8 rounded-lg flex items-center gap-2 transition-colors" disabled="">
+                    Next: Map Columns
+                    <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+</div>
+</footer>
+<div class="fixed top-0 left-0 w-full h-full pointer-events-none -z-50 overflow-hidden bg-white dark:bg-slate-900">
+<div class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px]"></div>
+</div>
+</body></html>

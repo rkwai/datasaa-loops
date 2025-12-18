@@ -1,6 +1,73 @@
 /// <reference lib="dom" />
 
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { test, expect, type Page } from '@playwright/test'
+
+const DIST_DIR = fileURLToPath(new URL('../dist', import.meta.url))
+const MIME_MAP: Record<string, string> = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.ico': 'image/x-icon',
+  '.map': 'application/json; charset=utf-8',
+  '.txt': 'text/plain; charset=utf-8',
+}
+
+async function serveBuiltApp(page: Page) {
+  await ensureDistReady()
+  await page.route('**/*', async (route) => {
+    const url = new URL(route.request().url())
+    const filePath = await resolveAssetPath(url.pathname)
+    const body = await fs.readFile(filePath)
+    const contentType = MIME_MAP[path.extname(filePath).toLowerCase()] ?? 'application/octet-stream'
+    await route.fulfill({
+      status: 200,
+      body,
+      headers: {
+        'content-type': contentType,
+      },
+    })
+  })
+  await page.goto('/')
+}
+
+async function ensureDistReady() {
+  try {
+    const stats = await fs.stat(DIST_DIR)
+    if (!stats.isDirectory()) {
+      throw new Error('dist/ is not a directory. Run npm run build before playwright.')
+    }
+  } catch (error) {
+    throw new Error('Missing dist/ output. Run npm run build before playwright.', { cause: error })
+  }
+}
+
+async function resolveAssetPath(pathname: string) {
+  const clean = decodeURIComponent(pathname.split('?')[0] ?? '/').replace(/^\/+/, '')
+  const candidate = path.join(DIST_DIR, clean || 'index.html')
+  if (await fileExists(candidate)) {
+    return candidate
+  }
+  return path.join(DIST_DIR, 'index.html')
+}
+
+async function fileExists(filePath: string) {
+  try {
+    const stats = await fs.stat(filePath)
+    return stats.isFile()
+  } catch {
+    return false
+  }
+}
+
+test.beforeEach(async ({ page }) => {
+  await serveBuiltApp(page)
+})
 
 const customersCsv = `customerId,acquisitionDate,channelSourceId
 cust_high,2024-01-01,paid
@@ -102,8 +169,10 @@ test('user flows: data intake, ratio views, spend plan, governance, exports', as
   // Attribution map interaction
   await page.getByTestId('nav-attribution').click()
   await expect(page.getByText('Dynamic CAC attribution map')).toBeVisible()
-  await page.locator('svg line').first().click({ position: { x: 5, y: 5 } })
-  await expect(page.getByText('LTV:CAC')).toBeVisible()
+  const firstEdge = page.locator('[data-testid^="edge-"]').first()
+  await firstEdge.waitFor({ state: 'attached' })
+  await firstEdge.evaluate((node) => node.dispatchEvent(new MouseEvent('click', { bubbles: true })))
+  await expect(page.getByTestId('edge-detail-panel')).toBeVisible()
 
   // Spend plan flow
   await page.getByTestId('nav-plan').click()

@@ -140,6 +140,10 @@ export function AttributionMapScreen() {
                 opacity={0.75}
                 onClick={() => setSelectedEdge(edge)}
                 style={{ cursor: 'pointer' }}
+                role="button"
+                tabIndex={0}
+                aria-label={`${edge.channelId} to ${edge.segment}`}
+                data-testid={`edge-${edge.channelId}-${edge.segment}`}
               />
             )
           })}
@@ -148,7 +152,7 @@ export function AttributionMapScreen() {
       </section>
 
       {selectedEdge && (
-        <div className="surface" style={{ marginTop: '1.5rem', borderRadius: 28 }}>
+        <div className="surface" style={{ marginTop: '1.5rem', borderRadius: 28 }} data-testid="edge-detail-panel">
           <h3 style={{ marginTop: 0 }}>
             {selectedEdge.channelId} → {selectedEdge.segment}
           </h3>

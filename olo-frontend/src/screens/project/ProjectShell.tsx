@@ -111,11 +111,6 @@ export function ProjectShell() {
                 </NavLink>
               ))}
             </nav>
-            {!hasWriteLock && (
-              <div className="banner warning">
-                Project is open in another tab. This tab is read-only until it is closed.
-              </div>
-            )}
           </aside>
           <main className="content">
             <Outlet />
@@ -123,7 +118,7 @@ export function ProjectShell() {
         </div>
       </ProjectProvider>
     )
-  }, [projectId, meta, loading, hasWriteLock])
+  }, [projectId, meta, loading])
 
   const headerActions = (
     <>

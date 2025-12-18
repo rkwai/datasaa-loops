@@ -475,6 +475,10 @@ textarea:focus {
   align-items: center;
   gap: 0.85rem;
   min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
 }
 
 .home-logo {

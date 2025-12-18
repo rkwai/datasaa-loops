@@ -93,7 +93,7 @@ export function AttributionMapScreen() {
       <section className="attribution-hero">
         <div>
           <span className="dashboard-chip">The Methodology</span>
-          <h1>Dynamic CAC attribution map</h1>
+          <h1 data-testid="attribution-title">Dynamic CAC attribution map</h1>
           <p>
             Visualize your growth loop, spot leaks, and identify which channels are consistently creating high-value
             segments. Click a beam to inspect its payback math.

@@ -140,13 +140,15 @@ export function AuditLogScreen() {
                     </div>
                     <div>
                       <strong>{entry.userLabel ?? 'System'}</strong>
-                      <span>{entry.payload?.device ?? 'Local device'}</span>
+                      <span>{(entry.payload?.device as string) ?? 'Local device'}</span>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <span className="badge">{entry.type}</span>
-                </td>
+                  <span className="badge" data-testid="audit-type">
+                    {entry.type}
+                  </span>
+              </td>
                 <td>
                   <code>{JSON.stringify(entry.payload)}</code>
                 </td>

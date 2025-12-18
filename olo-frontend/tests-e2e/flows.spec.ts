@@ -104,7 +104,7 @@ async function uploadDataset(page: Page, dataset: string, csv: string) {
   await expect(page.getByTestId('import-status')).toBeVisible({
     timeout: 20000,
   })
-  await page.getByRole('button', { name: 'Close' }).click()
+  await page.getByTestId('import-modal-close').click()
 }
 
 async function resetStorage(page: Page) {
@@ -141,17 +141,18 @@ const spend = spendCsv
 
 async function createProject(page: Page, name = 'E2E Ratio Lab') {
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Operational Loop Optimizer' })).toBeVisible()
-  await page.getByLabel('Project name').fill(name)
-  await page.getByLabel('Currency').fill('USD')
-  await page.getByLabel('Timezone').fill('UTC')
+  await expect(page.getByTestId('app-title')).toBeVisible()
+  await page.getByTestId('open-project-modal').click()
+  await page.getByTestId('project-name-input').fill(name)
+  await page.getByTestId('project-currency-input').fill('USD')
+  await page.getByTestId('project-timezone-input').fill('UTC')
   await page.getByRole('button', { name: 'Launch workspace', exact: true }).click()
   await expect(page).toHaveURL(/\/project\//)
 }
 
 async function completeDataIntake(page: Page) {
   await page.getByTestId('nav-import').click()
-  await expect(page.getByRole('heading', { name: /get your data in/i })).toBeVisible({ timeout: 15000 })
+  await expect(page.getByTestId('import-hero-title')).toBeVisible({ timeout: 15000 })
   await uploadDataset(page, 'customers', customers)
   await uploadDataset(page, 'transactions', transactions)
   await uploadDataset(page, 'channels', channels)
@@ -170,7 +171,7 @@ test('user flows: data intake, ratio views, spend plan, governance, exports', as
 
   // Attribution map interaction
   await page.getByTestId('nav-attribution').click()
-  await expect(page.getByText('Dynamic CAC attribution map')).toBeVisible()
+  await expect(page.getByTestId('attribution-title')).toBeVisible()
   const firstEdge = page.locator('[data-testid^="edge-"]').first()
   await firstEdge.waitFor({ state: 'attached' })
   await firstEdge.evaluate((node) => node.dispatchEvent(new MouseEvent('click', { bubbles: true })))
@@ -181,16 +182,16 @@ test('user flows: data intake, ratio views, spend plan, governance, exports', as
   const firstInput = page.getByTestId('spend-input-paid')
   await firstInput.fill('1500')
   await page.getByTestId('approve-plan').click()
-  await expect(page.getByText('Plan approved locally.')).toBeVisible()
+  await expect(page.getByTestId('plan-status')).toBeVisible()
 
   // Settings and audit log
   await page.getByTestId('nav-settings').click()
-  await page.getByLabel('LTV window (days)').fill('60')
-  await page.getByRole('button', { name: 'Save settings' }).click()
+  await page.getByTestId('settings-ltv-window').fill('60')
+  await page.getByTestId('save-settings').click()
   await expect(page.getByText('Settings saved.')).toBeVisible()
 
   await page.getByTestId('nav-audit').click()
-  await expect(page.getByText('SETTINGS_CHANGE')).toBeVisible()
+  await expect(page.getByTestId('audit-type').filter({ hasText: 'SETTINGS_CHANGE' }).first()).toBeVisible()
 
   // Export bundle confirmation
   await page.getByTestId('nav-export').click()

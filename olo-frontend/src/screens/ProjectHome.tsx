@@ -114,7 +114,7 @@ export function ProjectHome() {
               Spin up an isolated project to import customers, campaigns, and spend streams. Everything stays
               on-device, so you can rapidly test ways to improve the LTV↔CAC ratio of your top segments.
             </p>
-            <button type="button" onClick={() => setShowCreateModal(true)}>
+            <button type="button" data-testid="open-project-modal" onClick={() => setShowCreateModal(true)}>
               Create new project
             </button>
           </div>
@@ -224,6 +224,7 @@ export function ProjectHome() {
                 <label htmlFor="project-name-input">Project name</label>
                 <input
                   id="project-name-input"
+                  data-testid="project-name-input"
                   ref={nameInputRef}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -234,6 +235,7 @@ export function ProjectHome() {
                 <label htmlFor="project-currency-input">Currency</label>
                 <input
                   id="project-currency-input"
+                  data-testid="project-currency-input"
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
                 />
@@ -242,6 +244,7 @@ export function ProjectHome() {
                 <label htmlFor="project-timezone-input">Timezone</label>
                 <input
                   id="project-timezone-input"
+                  data-testid="project-timezone-input"
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
                 />

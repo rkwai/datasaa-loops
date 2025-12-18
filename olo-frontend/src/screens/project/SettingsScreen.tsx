@@ -124,7 +124,7 @@ export function SettingsScreen() {
           </div>
           <div className="settings-hero-actions">
             {message && <span className="pill">{message}</span>}
-            <button type="submit">Save changes</button>
+            <button type="submit" data-testid="save-settings">Save changes</button>
           </div>
         </header>
 
@@ -149,6 +149,7 @@ export function SettingsScreen() {
               <span>LTV window (days)</span>
               <input
                 type="number"
+                data-testid="settings-ltv-window"
                 value={ltvWindowDays}
                 placeholder="All time"
                 onChange={(e) => setLtvWindowDays(e.target.value)}

@@ -149,7 +149,11 @@ export function SpendPlanScreen() {
             <h1>Spend reallocation</h1>
             <p>Optimize your operational loops by reallocating budget to high-performing channels.</p>
           </div>
-          {message && <span className="pill">{message}</span>}
+    {message && (
+      <span className="pill" data-testid="plan-status">
+        {message}
+      </span>
+    )}
         </div>
         <div className="objective-toggle">
           {OBJECTIVE_PRESETS.map((option) => (
@@ -238,7 +242,7 @@ export function SpendPlanScreen() {
                         </div>
                         <div>
                           <strong>{item.channelId}</strong>
-                          <span>High-LTV share {((item.highLtvShare ?? 0) * 100).toFixed(0)}%</span>
+                          <span>Delta {item.delta >= 0 ? '+' : ''}${item.delta.toFixed(0)}</span>
                         </div>
                       </div>
                     </td>

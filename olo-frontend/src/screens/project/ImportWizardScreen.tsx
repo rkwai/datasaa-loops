@@ -20,6 +20,7 @@ export function ImportWizardScreen() {
   const [isRunning, setIsRunning] = useState(false)
   const [isDragActive, setIsDragActive] = useState(false)
   const [showMappingModal, setShowMappingModal] = useState(false)
+  const [currentStep, setCurrentStep] = useState(1)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const jobs = useLiveQuery(() => db.jobs.orderBy('updatedAt').reverse().limit(5).toArray(), [db])
@@ -32,6 +33,7 @@ export function ImportWizardScreen() {
     setColumns(parsed.columns)
     setPreview(parsed.rows)
     setMapping(buildAutoMapping(schema.fields.map((f) => f.key), parsed.columns))
+    setCurrentStep(2)
     setShowMappingModal(true)
   }
 
@@ -81,6 +83,7 @@ export function ImportWizardScreen() {
         (progress) => setStatus(`Compute: ${progress.phase}`),
       )
       setStatus('All data processed!')
+      setCurrentStep(3)
     } catch (err) {
       console.error(err)
       setError(err instanceof Error ? err.message : 'Import failed')
@@ -134,22 +137,28 @@ export function ImportWizardScreen() {
     setStatus(null)
     setError(null)
     setShowMappingModal(false)
+    setCurrentStep(1)
+  }
+
+  function closeMappingModal() {
+    setShowMappingModal(false)
+    setCurrentStep(file ? Math.min(currentStep, 2) : 1)
   }
 
   return (
     <div className="import-shell">
       <header className="import-steps-bar">
-        <div className="import-step active">
+        <div className={`import-step${currentStep === 1 ? ' active' : ''}`}>
           <span>1</span>
           Upload
         </div>
         <div className="import-step-line" />
-        <div className="import-step">
+        <div className={`import-step${currentStep === 2 ? ' active' : ''}`}>
           <span>2</span>
           Map columns
         </div>
         <div className="import-step-line" />
-        <div className="import-step">
+        <div className={`import-step${currentStep === 3 ? ' active' : ''}`}>
           <span>3</span>
           Review
         </div>
@@ -163,7 +172,7 @@ export function ImportWizardScreen() {
       <main className="import-main">
         <section className="import-hero">
           <div>
-            <h1>Let’s get your data in.</h1>
+            <h1 data-testid="import-hero-title">Let’s get your data in.</h1>
             <p>
               Upload your customers, transactions, channels, and spend so the compute engine can keep your LTV:CAC ratio
               honest. Every import reruns the pipeline automatically.
@@ -236,99 +245,6 @@ export function ImportWizardScreen() {
           </div>
         </section>
 
-        <form className="import-form" onSubmit={handleSubmit}>
-          <section className="import-panel">
-            <label htmlFor="dataset-select">Dataset</label>
-            <select
-              id="dataset-select"
-              data-testid="dataset-select"
-              value={dataset}
-              onChange={(e) => {
-                const value = e.target.value as DatasetType
-                setDataset(value)
-                if (columns.length) {
-                  const targetSchema = DATASET_SCHEMAS[value]
-                  setMapping(buildAutoMapping(targetSchema.fields.map((f) => f.key), columns))
-                }
-              }}
-            >
-              {DATASET_OPTIONS.map((option) => (
-                <option key={option.type} value={option.type}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <p className="page-description">{schema.description}</p>
-          </section>
-
-          <section className="import-panel">
-            <h3>Column mapping</h3>
-            <div className="import-mapping-grid">
-              {schema.fields.map((field) => (
-                <div key={field.key}>
-                  <label>
-                    {field.label} {field.required && <span className="badge">Required</span>}
-                  </label>
-                  <select
-                    value={mapping[field.key] ?? ''}
-                    onChange={(e) =>
-                      setMapping((prev) => ({
-                        ...prev,
-                        [field.key]: e.target.value,
-                      }))
-                    }
-                  >
-                    <option value="">Select column</option>
-                    {columns.map((column) => (
-                      <option key={column} value={column}>
-                        {column}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {previewColumns.length > 0 && (
-            <section className="import-panel">
-              <h3>Preview (first {previewColumns.length} rows)</h3>
-              <div className="dashboard-table" style={{ marginTop: '0.75rem' }}>
-                <table>
-                  <thead>
-                    <tr>
-                      {columns.map((column) => (
-                        <th key={column}>{column}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {previewColumns.map((row, idx) => (
-                      <tr key={idx}>
-                        {columns.map((column) => (
-                          <td key={column}>{row[column]}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-
-          {error && <p className="banner warning">{error}</p>}
-
-          <div className="import-footer">
-            <button type="button" className="ghost" onClick={handleReset}>
-              Cancel
-            </button>
-            <button type="submit" data-testid="import-submit" disabled={isRunning}>
-              Commit import
-              <span className="material-symbols-outlined">arrow_forward</span>
-            </button>
-          </div>
-        </form>
-
         <section className="import-panel">
           <h3 style={{ marginTop: 0 }}>Recent jobs</h3>
           {!jobs && <p>Loading jobs…</p>}
@@ -363,7 +279,7 @@ export function ImportWizardScreen() {
                   {file ? file.name : 'Choose a file to begin mapping columns.'}
                 </p>
               </div>
-              <button type="button" className="ghost" onClick={() => setShowMappingModal(false)}>
+              <button type="button" className="ghost" data-testid="import-modal-close" onClick={closeMappingModal}>
                 Close
               </button>
             </div>

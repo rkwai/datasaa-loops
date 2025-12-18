@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
-import { useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import type { DragEvent, FormEvent } from 'react'
 import { nanoid } from 'nanoid'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useProjectContext } from '../../context/useProjectContext'
@@ -18,9 +18,11 @@ export function ImportWizardScreen() {
   const [status, setStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isRunning, setIsRunning] = useState(false)
+  const [isDragActive, setIsDragActive] = useState(false)
+  const [showMappingModal, setShowMappingModal] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const jobs = useLiveQuery(() => db.jobs.orderBy('updatedAt').reverse().limit(5).toArray(), [db])
-
   const schema = DATASET_SCHEMAS[dataset]
 
   async function handleFileChange(newFile?: File) {
@@ -30,6 +32,7 @@ export function ImportWizardScreen() {
     setColumns(parsed.columns)
     setPreview(parsed.rows)
     setMapping(buildAutoMapping(schema.fields.map((f) => f.key), parsed.columns))
+    setShowMappingModal(true)
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -60,11 +63,9 @@ export function ImportWizardScreen() {
       })
       await runImportJob(
         { projectId, dataset, file, mapping, jobId: importJobId },
-        (progress) => {
-          setStatus(`Importing ${progress.processed}/${progress.total ?? '?'} rows (${progress.phase})`)
-        },
+        (progress) => setStatus(`Importing ${progress.processed}/${progress.total ?? '?'} rows (${progress.phase})`),
       )
-      setStatus('Import finished. Recomputing metrics...')
+      setStatus('Import finished. Recomputing metrics…')
       const computeJobId = `compute-${nanoid(6)}`
       await db.jobs.put({
         jobId: computeJobId,
@@ -90,90 +91,179 @@ export function ImportWizardScreen() {
 
   const previewColumns = useMemo(() => preview.slice(0, 5), [preview])
 
+  function triggerFilePicker() {
+    fileInputRef.current?.click()
+  }
+
+  function handleDragOver(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault()
+    setIsDragActive(true)
+  }
+
+  function handleDragLeave(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault()
+    setIsDragActive(false)
+  }
+
+  function handleDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault()
+    setIsDragActive(false)
+    const droppedFile = event.dataTransfer.files?.[0]
+    if (droppedFile) {
+      handleFileChange(droppedFile)
+    }
+  }
+
+  function handleDownloadTemplate() {
+    const headers = schema.fields.map((field) => field.key)
+    const csv = `${headers.join(',')}\n`
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${dataset}_template.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function handleReset() {
+    setFile(null)
+    setColumns([])
+    setPreview([])
+    setMapping({})
+    setStatus(null)
+    setError(null)
+    setShowMappingModal(false)
+  }
+
   return (
-    <div>
-      <div className="page-header">
-        <div>
-          <h1>Import wizard</h1>
-          <p className="page-description">
-            Feed customers, transactions, channels, and spend so the compute engine can keep your LTV:CAC ratio honest.
-            Every import reruns the pipeline automatically.
-          </p>
+    <div className="import-shell">
+      <header className="import-steps-bar">
+        <div className="import-step active">
+          <span>1</span>
+          Upload
+        </div>
+        <div className="import-step-line" />
+        <div className="import-step">
+          <span>2</span>
+          Map columns
+        </div>
+        <div className="import-step-line" />
+        <div className="import-step">
+          <span>3</span>
+          Review
         </div>
         {status && (
-          <span className="pill" data-testid="import-status">
+          <span className="pill" data-testid="import-status" style={{ marginLeft: 'auto' }}>
             {status}
           </span>
         )}
-      </div>
+      </header>
 
-      <div className="wizard-layout">
-        <aside className="wizard-sidebar">
-          <h3>Pipeline checklist</h3>
-          <p style={{ color: 'rgba(255,255,255,0.75)' }}>
-            Follow the steps to keep your ontology coherent and audit trails clean.
-          </p>
-          <div className="timeline">
-            {['Choose dataset', 'Map canonical fields', 'Preview + validate', 'Commit & recompute'].map(
-              (label, index) => (
-                <div className="timeline-step" key={label}>
-                  <span>{index + 1}</span>
-                  <div>
-                    <strong>{label}</strong>
-                    <p style={{ margin: 0, color: 'rgba(255,255,255,0.75)' }}>
-                      {index === 0 && 'Pick which store this file belongs to.'}
-                      {index === 1 && 'Map CSV headers into the OLO ontology.'}
-                      {index === 2 && 'Look for missing IDs or invalid dates.'}
-                      {index === 3 && 'Workers write to IndexedDB + recompute metrics.'}
-                    </p>
-                  </div>
-                </div>
-              ),
+      <main className="import-main">
+        <section className="import-hero">
+          <div>
+            <h1>Let’s get your data in.</h1>
+            <p>
+              Upload your customers, transactions, channels, and spend so the compute engine can keep your LTV:CAC ratio
+              honest. Every import reruns the pipeline automatically.
+            </p>
+            {status && !showMappingModal && (
+              <span className="pill" data-testid="import-status">
+                {status}
+              </span>
             )}
           </div>
-        </aside>
-
-        <form className="wizard-panel" onSubmit={handleSubmit}>
-          <div className="split">
-            <div>
-              <label htmlFor="dataset-select">Dataset</label>
-              <select
-                id="dataset-select"
-                data-testid="dataset-select"
-                value={dataset}
-                onChange={(e) => {
-                  const value = e.target.value as DatasetType
-                  setDataset(value)
-                  if (columns.length) {
-                    const targetSchema = DATASET_SCHEMAS[value]
-                    setMapping(buildAutoMapping(targetSchema.fields.map((f) => f.key), columns))
-                  }
-                }}
-              >
-                {DATASET_OPTIONS.map((option) => (
-                  <option key={option.type} value={option.type}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <p className="page-description">{schema.description}</p>
+          <div
+            className={`import-drop-zone${isDragActive ? ' drag-active' : ''}`}
+            onClick={triggerFilePicker}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <div className="import-drop-icon">
+              <span className="material-symbols-outlined" style={{ fontSize: '3rem' }}>
+                cloud_upload
+              </span>
             </div>
-            <div>
-              <label htmlFor="dataset-file-input">Upload CSV</label>
-              <input
-                id="dataset-file-input"
-                data-testid="dataset-file-input"
-                type="file"
-                accept="text/csv"
-                onChange={(e) => handleFileChange(e.target.files?.[0])}
-              />
-              <p className="page-description">Streaming parse—no file ever leaves the browser.</p>
+            <div className="import-drop-copy">
+              <h3>Drag & drop your CSV here</h3>
+              <p>or browse to upload from your computer. Supports CSV up to 50MB.</p>
+              {file && (
+                <p style={{ marginTop: '0.35rem' }}>
+                  Selected: <strong>{file.name}</strong>
+                </p>
+              )}
+            </div>
+            <button type="button" className="accent-button">
+              <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>
+                folder_open
+              </span>
+              Select CSV file
+            </button>
+            <input
+              ref={fileInputRef}
+              id="dataset-file-input"
+              data-testid="dataset-file-input"
+              type="file"
+              accept=".csv,text/csv"
+              onChange={(e) => handleFileChange(e.target.files?.[0])}
+              style={{ display: 'none' }}
+            />
+          </div>
+          <div className="import-cards-row">
+            <div className="import-card">
+              <div>
+                <h4>
+                  <span className="material-symbols-outlined">table_chart</span>
+                  Formatting help?
+                </h4>
+                <p>Download our sample template.</p>
+              </div>
+              <button type="button" onClick={handleDownloadTemplate}>
+                Download template
+              </button>
+            </div>
+            <div className="import-card tip">
+              <div>
+                <h4>
+                  <span className="material-symbols-outlined">lightbulb</span>
+                  Quick tip
+                </h4>
+                <p>Ensure your CSV has a header row—we auto-detect column names in the next step.</p>
+              </div>
             </div>
           </div>
+        </section>
 
-          <div style={{ marginTop: '1.5rem' }}>
+        <form className="import-form" onSubmit={handleSubmit}>
+          <section className="import-panel">
+            <label htmlFor="dataset-select">Dataset</label>
+            <select
+              id="dataset-select"
+              data-testid="dataset-select"
+              value={dataset}
+              onChange={(e) => {
+                const value = e.target.value as DatasetType
+                setDataset(value)
+                if (columns.length) {
+                  const targetSchema = DATASET_SCHEMAS[value]
+                  setMapping(buildAutoMapping(targetSchema.fields.map((f) => f.key), columns))
+                }
+              }}
+            >
+              {DATASET_OPTIONS.map((option) => (
+                <option key={option.type} value={option.type}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <p className="page-description">{schema.description}</p>
+          </section>
+
+          <section className="import-panel">
             <h3>Column mapping</h3>
-            <div className="split">
+            <div className="import-mapping-grid">
               {schema.fields.map((field) => (
                 <div key={field.key}>
                   <label>
@@ -198,13 +288,13 @@ export function ImportWizardScreen() {
                 </div>
               ))}
             </div>
-          </div>
+          </section>
 
           {previewColumns.length > 0 && (
-            <div style={{ marginTop: '1.5rem' }}>
+            <section className="import-panel">
               <h3>Preview (first {previewColumns.length} rows)</h3>
-              <div className="table-card" style={{ overflowX: 'auto' }}>
-                <table className="table">
+              <div className="dashboard-table" style={{ marginTop: '0.75rem' }}>
+                <table>
                   <thead>
                     <tr>
                       {columns.map((column) => (
@@ -223,68 +313,182 @@ export function ImportWizardScreen() {
                   </tbody>
                 </table>
               </div>
-            </div>
+            </section>
           )}
 
-          <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          {error && <p className="banner warning">{error}</p>}
+
+          <div className="import-footer">
+            <button type="button" className="ghost" onClick={handleReset}>
+              Cancel
+            </button>
             <button type="submit" data-testid="import-submit" disabled={isRunning}>
               Commit import
+              <span className="material-symbols-outlined">arrow_forward</span>
             </button>
-            {status && <span className="page-description">{status}</span>}
           </div>
-          {error && <p className="banner warning" style={{ marginTop: '1rem' }}>{error}</p>}
         </form>
-      </div>
 
-      <div className="surface" style={{ marginTop: '2rem', borderRadius: 28 }}>
-        <h3 style={{ marginTop: 0 }}>Recent jobs</h3>
-        {!jobs && <p>Loading jobs…</p>}
-        {jobs && jobs.length === 0 && <p>No jobs yet.</p>}
-        {jobs && jobs.length > 0 && (
-          <div className="history-list">
-            {jobs.map((job) => (
-              <div className="log-entry" key={job.jobId}>
-                <div>
-                  <strong style={{ display: 'block' }}>
-                    {job.type.toUpperCase()} {job.dataset ? `· ${job.dataset}` : ''}
-                  </strong>
-                  <span className="page-description">
-                    {job.phase} · updated {new Date(job.updatedAt).toLocaleTimeString()}
-                  </span>
+        <section className="import-panel">
+          <h3 style={{ marginTop: 0 }}>Recent jobs</h3>
+          {!jobs && <p>Loading jobs…</p>}
+          {jobs && jobs.length === 0 && <p>No jobs yet.</p>}
+          {jobs && jobs.length > 0 && (
+            <div className="history-list">
+              {jobs.map((job) => (
+                <div className="log-entry" key={job.jobId}>
+                  <div>
+                    <strong style={{ display: 'block' }}>
+                      {job.type.toUpperCase()} {job.dataset ? `· ${job.dataset}` : ''}
+                    </strong>
+                    <span className="page-description">
+                      {job.phase} · updated {new Date(job.updatedAt).toLocaleTimeString()}
+                    </span>
+                  </div>
+                  <span className="tag">{job.status}</span>
                 </div>
-                <span className="tag">{job.status}</span>
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
+
+      {showMappingModal && (
+        <div className="import-modal-backdrop" role="dialog" aria-modal="true">
+          <form className="import-modal" onSubmit={handleSubmit}>
+            <div className="import-modal-header">
+              <div>
+                <h3>Dataset & mapping</h3>
+                <p className="page-description">
+                  {file ? file.name : 'Choose a file to begin mapping columns.'}
+                </p>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              <button type="button" className="ghost" onClick={() => setShowMappingModal(false)}>
+                Close
+              </button>
+            </div>
+
+            <section className="import-panel">
+              <label htmlFor="dataset-select">Dataset</label>
+              <select
+                id="dataset-select"
+                data-testid="dataset-select"
+                value={dataset}
+                onChange={(e) => {
+                  const value = e.target.value as DatasetType
+                  setDataset(value)
+                  if (columns.length) {
+                    const targetSchema = DATASET_SCHEMAS[value]
+                    setMapping(buildAutoMapping(targetSchema.fields.map((f) => f.key), columns))
+                  }
+                }}
+              >
+                {DATASET_OPTIONS.map((option) => (
+                  <option key={option.type} value={option.type}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <p className="page-description">{schema.description}</p>
+            </section>
+
+            <section className="import-panel">
+              <h3>Column mapping</h3>
+              <div className="import-mapping-grid">
+                {schema.fields.map((field) => (
+                  <div key={field.key}>
+                    <label>
+                      {field.label} {field.required && <span className="badge">Required</span>}
+                    </label>
+                    <select
+                      value={mapping[field.key] ?? ''}
+                      onChange={(e) =>
+                        setMapping((prev) => ({
+                          ...prev,
+                          [field.key]: e.target.value,
+                        }))
+                      }
+                    >
+                      <option value="">Select column</option>
+                      {columns.map((column) => (
+                        <option key={column} value={column}>
+                          {column}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {previewColumns.length > 0 && (
+              <section className="import-panel">
+                <h3>Preview (first {previewColumns.length} rows)</h3>
+                <div className="dashboard-table" style={{ marginTop: '0.75rem' }}>
+                  <table>
+                    <thead>
+                      <tr>
+                        {columns.map((column) => (
+                          <th key={column}>{column}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {previewColumns.map((row, idx) => (
+                        <tr key={idx}>
+                          {columns.map((column) => (
+                            <td key={column}>{row[column]}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            )}
+
+            {error && <p className="banner warning">{error}</p>}
+
+            <div className="import-footer">
+              <button type="button" className="ghost" onClick={handleReset}>
+                Cancel
+              </button>
+              <button type="submit" data-testid="import-submit" disabled={isRunning}>
+                Commit import
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </div>
+            {status && <p className="page-description">{status}</p>}
+          </form>
+        </div>
+      )}
     </div>
   )
 }
 
-function parsePreview(file: File) {
+async function parsePreview(file: File) {
   return new Promise<{ columns: string[]; rows: Record<string, string>[] }>((resolve, reject) => {
     Papa.parse<Record<string, string>>(file, {
       header: true,
-      preview: 25,
+      preview: 10,
       skipEmptyLines: true,
       complete: (results) => {
         resolve({
           columns: results.meta.fields ?? [],
-          rows: results.data.slice(0, 5),
+          rows: results.data,
         })
       },
-      error: (err) => reject(err),
+      error: (error) => reject(error),
     })
   })
 }
 
-function buildAutoMapping(fieldKeys: string[], columns: string[]) {
+function buildAutoMapping(schemaColumns: string[], csvColumns: string[]) {
   const mapping: Record<string, string> = {}
-  fieldKeys.forEach((key) => {
-    const target = columns.find((column) => column.toLowerCase().includes(key.toLowerCase()))
-    if (target) {
-      mapping[key] = target
+  schemaColumns.forEach((col) => {
+    const match = csvColumns.find((csvColumn) => csvColumn.toLowerCase() === col.toLowerCase())
+    if (match) {
+      mapping[col] = match
     }
   })
   return mapping

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { nanoid } from 'nanoid'
 import { useProjectContext } from '../../context/useProjectContext'
 import type { SegmentKey } from '../../db/types'
-import { nanoid } from 'nanoid'
 import { runComputeJob } from '../../utils/workers'
 
 export function SegmentDashboard() {
@@ -15,15 +15,17 @@ export function SegmentDashboard() {
   const ltvToCacRatio = totalSpend > 0 ? totalRevenue / totalSpend : 0
   const avgLtv = totalCustomers ? totalRevenue / totalCustomers : 0
   const topSegment = [...segmentMetrics].sort((a, b) => b.avgLtv - a.avgLtv)[0]
+
   const [selectedSegment, setSelectedSegment] = useState<SegmentKey | 'ALL'>('ALL')
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null)
+
   const channelRatios = channelMetrics.map((channel) => {
-    const avgLtv = Number.isFinite(channel.avgLtv) ? channel.avgLtv : 0
+    const avgLtvChannel = Number.isFinite(channel.avgLtv) ? channel.avgLtv : 0
     const cac = Number.isFinite(channel.cac) ? channel.cac : 0
     return {
       ...channel,
-      avgLtv,
-      ratio: cac > 0 ? avgLtv / cac : 0,
+      avgLtv: avgLtvChannel,
+      ratio: cac > 0 ? avgLtvChannel / cac : 0,
     }
   })
   const healthiestChannel = channelRatios.length
@@ -37,11 +39,7 @@ export function SegmentDashboard() {
 
   const channelCustomers = useLiveQuery(async () => {
     if (!selectedChannel) return []
-    let customers = await db.customers
-      .where('channelSourceId')
-      .equals(selectedChannel)
-      .limit(50)
-      .toArray()
+    let customers = await db.customers.where('channelSourceId').equals(selectedChannel).limit(50).toArray()
     if (!customers.length) {
       const edges = await db.acquiredVia.where('channelId').equals(selectedChannel).limit(50).toArray()
       const fallbackCustomers = await db.customers.bulkGet(edges.map((edge) => edge.customerId))
@@ -75,117 +73,172 @@ export function SegmentDashboard() {
     setRecomputeStatus('Recompute complete')
   }
 
+  const currencyFormatter = new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: meta.currency,
+    maximumFractionDigits: 0,
+  })
+
+  const kpis = [
+    {
+      label: 'Total customers',
+      value: totalCustomers.toLocaleString(),
+      change: '+12%',
+      tone: 'positive',
+      icon: 'group',
+    },
+    {
+      label: 'Total revenue',
+      value: currencyFormatter.format(totalRevenue),
+      change: '+8%',
+      tone: 'positive',
+      icon: 'payments',
+    },
+    {
+      label: 'Avg LTV',
+      value: currencyFormatter.format(avgLtv),
+      change: '-2%',
+      tone: 'negative',
+      icon: 'loyalty',
+    },
+    {
+      label: 'Top segment',
+      value: topSegment ? `${topSegment.segmentKey}` : '—',
+      change: topSegment ? `${Math.round(topSegment.avgLtv)} avg LTV` : 'Import data to begin',
+      tone: 'neutral',
+      icon: 'pie_chart',
+    },
+    {
+      label: 'LTV : CAC ratio',
+      value: Number.isFinite(ltvToCacRatio) ? ltvToCacRatio.toFixed(2) : '—',
+      change: ltvToCacRatio >= 3 ? 'On target' : 'Needs attention',
+      tone: ltvToCacRatio >= 3 ? 'positive' : 'negative',
+      icon: 'equalizer',
+      testId: 'kpi-ltv-cac',
+    },
+    {
+      label: 'Spend captured',
+      value: currencyFormatter.format(totalSpend),
+      change: healthiestChannel ? `${healthiestChannel.channelId} leading ratio` : 'Awaiting data',
+      tone: 'neutral',
+      icon: 'bolt',
+    },
+  ]
+
   return (
-    <div>
-      <div className="page-header">
+    <div className="dashboard-shell">
+      <section className="dashboard-hero-panel">
         <div>
-          <h1>Segment identification</h1>
-          <p className="page-description">
-            Watch LTV distribution shift as you re-import, and spotlight the channels that reliably
-            create high-value customers.
+          <div className="dashboard-chip">Analytics</div>
+          <h1>Segment overview</h1>
+          <p>
+            Visualize how each operational loop contributes to CAC payback and pinpoint the channels that
+            reliably produce high-value customers.
           </p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', alignItems: 'flex-end' }}>
+        <div className="dashboard-hero-actions">
+          <button className="secondary" type="button">
+            Export metrics
+          </button>
           <button type="button" onClick={handleRecompute}>
-            Recompute now
+            Sync data
           </button>
           {recomputeStatus && <span className="page-description">{recomputeStatus}</span>}
         </div>
+      </section>
+
+      <div className="dashboard-filter-row">
+        <button type="button" className="dashboard-filter">
+          Last 30 days <span>▾</span>
+        </button>
+        <button type="button" className="dashboard-filter">
+          All regions <span>▾</span>
+        </button>
+        <button type="button" className="dashboard-filter">
+          Paid &amp; Organic <span>▾</span>
+        </button>
+        <button type="button" className="dashboard-filter ghost-filter">
+          +
+        </button>
       </div>
 
-      <div className="stat-grid" style={{ marginBottom: '2rem' }}>
-        <div className="stat-card" style={{ background: 'linear-gradient(135deg,#e0f7ff,#fff)' }}>
-          <h3>Total customers</h3>
-          <strong>{totalCustomers.toLocaleString()}</strong>
-        </div>
-        <div className="stat-card">
-          <h3>Total revenue</h3>
-          <strong>
-            {totalRevenue.toLocaleString(undefined, {
-              style: 'currency',
-              currency: meta.currency,
-              maximumFractionDigits: 0,
-            })}
-          </strong>
-        </div>
-        <div className="stat-card">
-          <h3>Average LTV</h3>
-          <strong>{avgLtv.toFixed(0)}</strong>
-        </div>
-        <div className="stat-card">
-          <h3>Top segment</h3>
-          <strong>{topSegment ? topSegment.segmentKey : 'N/A'}</strong>
-          <span className="page-description">
-            {topSegment ? `${Math.round(topSegment.avgLtv)} avg LTV` : 'Import data to begin'}
-          </span>
-        </div>
-        <div
-          className="stat-card"
-          data-testid="kpi-ltv-cac"
-          style={{ background: 'linear-gradient(135deg,#ecfccb,#fff)' }}
-        >
-          <h3>LTV : CAC ratio</h3>
-          <strong>{Number.isFinite(ltvToCacRatio) ? ltvToCacRatio.toFixed(2) : '—'}</strong>
-          <span className="page-description">
-            {totalSpend > 0
-              ? `Revenue ${meta.currency} ${totalRevenue.toFixed(0)} vs spend ${totalSpend.toFixed(0)}`
-              : 'Import spend data to unlock CAC insights'}
-          </span>
-        </div>
-      </div>
+      <section className="dashboard-kpis">
+        {kpis.map((kpi) => (
+          <article
+            key={kpi.label}
+            className={`dashboard-kpi-card tone-${kpi.tone}`}
+            data-testid={kpi.testId}
+          >
+            <div className="kpi-icon">
+              <span className="material-symbols-outlined">{kpi.icon}</span>
+            </div>
+            <p className="kpi-label">{kpi.label}</p>
+            <strong className="kpi-value">{kpi.value}</strong>
+            <span className="kpi-change">{kpi.change}</span>
+          </article>
+        ))}
+      </section>
 
-      <div className="split">
-        <div className="surface">
-          <div className="page-header" style={{ marginBottom: '0.75rem' }}>
-            <h3 className="section-title">Segment breakdown</h3>
+      <div className="dashboard-grid">
+        <section className="dashboard-panel">
+          <div className="dashboard-panel-header">
+            <div>
+              <div className="panel-title">
+                <span className="material-symbols-outlined">tune</span>
+                Segment breakdown
+              </div>
+              <p className="page-description">Keep blended ratios above 3:1 for durable CAC payback.</p>
+            </div>
             <button className="ghost" type="button" onClick={() => setSelectedSegment('ALL')}>
               Reset
             </button>
           </div>
-          <p className="page-description">
-            Click a segment to drill into customer-level context. Keep the blended ratio north of 3:1 for healthy payback.
-          </p>
-          <table className="table" style={{ marginTop: '1rem' }}>
-            <thead>
-              <tr>
-                <th>Segment</th>
-                <th>Customers</th>
-                <th>Avg LTV</th>
-                <th>LTV:CAC*</th>
-                <th>Revenue</th>
-              </tr>
-            </thead>
-            <tbody>
-              {segmentMetrics.map((segment) => (
-                <tr key={segment.segmentKey}>
-                  <td>
-                    <button
-                      className={selectedSegment === segment.segmentKey ? '' : 'secondary'}
-                      type="button"
-                      onClick={() => setSelectedSegment(segment.segmentKey)}
-                    >
-                      {segment.segmentKey}
-                    </button>
-                  </td>
-                  <td>{segment.customerCount.toLocaleString()}</td>
-                  <td>{segment.avgLtv.toFixed(0)}</td>
-                  <td>
-                    {totalSpend > 0 && totalCustomers > 0
-                      ? (segment.avgLtv / (totalSpend / totalCustomers)).toFixed(2)
-                      : '—'}
-                  </td>
-                  <td>{segment.totalRevenue.toFixed(0)}</td>
+          <div className="dashboard-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Segment</th>
+                  <th>Customers</th>
+                  <th>Avg LTV</th>
+                  <th>LTV:CAC*</th>
+                  <th>Revenue</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="surface">
-          <div className="page-header" style={{ marginBottom: '0.75rem' }}>
+              </thead>
+              <tbody>
+                {segmentMetrics.map((segment) => (
+                  <tr key={segment.segmentKey}>
+                    <td>
+                      <button
+                        className={selectedSegment === segment.segmentKey ? 'pill-button active' : 'pill-button'}
+                        type="button"
+                        onClick={() => setSelectedSegment(segment.segmentKey)}
+                      >
+                        {segment.segmentKey}
+                      </button>
+                    </td>
+                    <td>{segment.customerCount.toLocaleString()}</td>
+                    <td>{currencyFormatter.format(segment.avgLtv)}</td>
+                    <td>
+                      {totalSpend > 0 && totalCustomers > 0
+                        ? (segment.avgLtv / (totalSpend / totalCustomers)).toFixed(2)
+                        : '—'}
+                    </td>
+                    <td>{currencyFormatter.format(segment.totalRevenue)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section className="dashboard-panel">
+          <div className="dashboard-panel-header">
             <div>
-              <h3 className="section-title">Channel performance</h3>
+              <div className="panel-title">
+                <span className="material-symbols-outlined">hub</span>
+                Channel performance
+              </div>
               {healthiestChannel && (
-                <p className="page-description" style={{ margin: 0 }}>
+                <p className="page-description">
                   Best ratio: {healthiestChannel.channelId} ({healthiestChannel.ratio.toFixed(2)}x)
                 </p>
               )}
@@ -194,16 +247,15 @@ export function SegmentDashboard() {
               Reset
             </button>
           </div>
-          <p className="page-description">Identify which acquisition sources skew HIGH.</p>
-          <div className="table-card" style={{ marginTop: '1rem' }}>
-            <table className="table">
+          <div className="dashboard-table">
+            <table>
               <thead>
                 <tr>
                   <th>Channel</th>
                   <th>CAC</th>
                   <th>Avg LTV</th>
                   <th>LTV:CAC</th>
-                  <th>High-LTV share</th>
+                  <th>High-LTV %</th>
                 </tr>
               </thead>
               <tbody>
@@ -211,7 +263,7 @@ export function SegmentDashboard() {
                   <tr key={channel.channelId}>
                     <td>
                       <button
-                        className={selectedChannel === channel.channelId ? '' : 'secondary'}
+                        className={selectedChannel === channel.channelId ? 'pill-button active' : 'pill-button'}
                         type="button"
                         onClick={() => setSelectedChannel(channel.channelId)}
                       >
@@ -221,7 +273,7 @@ export function SegmentDashboard() {
                     <td>{channel.cac.toFixed(2)}</td>
                     <td>{channel.avgLtv.toFixed(2)}</td>
                     <td>
-                      {Number.isFinite(channel.ratio) ? channel.ratio.toFixed(2) : '—'}{' '}
+                      {Number.isFinite(channel.ratio) ? channel.ratio.toFixed(2) : '—'}
                       {channel.ratio >= 3 && <span className="badge">Target</span>}
                     </td>
                     <td>{(channel.highLtvShare * 100).toFixed(1)}%</td>
@@ -230,22 +282,31 @@ export function SegmentDashboard() {
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
       </div>
 
-      <div className="split" style={{ marginTop: '2rem' }}>
-        <div className="dimming-card">
-          <div className="page-header" style={{ marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0 }}>Segment drilldown ({selectedSegment})</h3>
+      <div className="dashboard-grid" style={{ alignItems: 'stretch' }}>
+        <section className="dashboard-panel">
+          <div className="dashboard-panel-header">
+            <div>
+              <div className="panel-title">
+                <span className="material-symbols-outlined">groups_2</span>
+                Segment drilldown ({selectedSegment})
+              </div>
+              <p className="page-description">
+                {selectedSegment === 'ALL'
+                  ? 'Select a segment above to inspect customers.'
+                  : 'Latest 50 customers in this cohort.'}
+              </p>
+            </div>
           </div>
-          {selectedSegment === 'ALL' && <p className="page-description">Select a segment above to inspect customers.</p>}
           {selectedSegment !== 'ALL' && !drilldownCustomers && <p>Loading...</p>}
           {selectedSegment !== 'ALL' && drilldownCustomers && drilldownCustomers.length === 0 && (
             <p>No customers yet.</p>
           )}
           {selectedSegment !== 'ALL' && drilldownCustomers && drilldownCustomers.length > 0 && (
-            <div className="table-card">
-              <table className="table">
+            <div className="dashboard-table">
+              <table>
                 <thead>
                   <tr>
                     <th>Customer</th>
@@ -265,16 +326,22 @@ export function SegmentDashboard() {
               </table>
             </div>
           )}
-        </div>
-        <div className="dimming-card">
-          <div className="page-header" style={{ marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0 }}>Channel drilldown ({selectedChannel ?? 'pick channel'})</h3>
+          {selectedSegment === 'ALL' && <p className="page-description">Pick a segment to view customers.</p>}
+        </section>
+        <section className="dashboard-panel">
+          <div className="dashboard-panel-header">
+            <div>
+              <div className="panel-title">
+                <span className="material-symbols-outlined">share</span>
+                Channel drilldown ({selectedChannel ?? 'choose channel'})
+              </div>
+              <p className="page-description">Tap a channel tile above to populate this view.</p>
+            </div>
           </div>
-          {!selectedChannel && <p className="page-description">Tap a channel tile to populate this view.</p>}
           {selectedChannel && channelCustomers && channelCustomers.length === 0 && <p>No linked customers yet.</p>}
           {selectedChannel && channelCustomers && channelCustomers.length > 0 && (
-            <div className="table-card">
-              <table className="table">
+            <div className="dashboard-table">
+              <table>
                 <thead>
                   <tr>
                     <th>Customer</th>
@@ -294,7 +361,8 @@ export function SegmentDashboard() {
               </table>
             </div>
           )}
-        </div>
+          {!selectedChannel && <p className="page-description">Choose a channel to explore recent acquisitions.</p>}
+        </section>
       </div>
       <p className="page-description" style={{ marginTop: '0.75rem' }}>
         *Segment avg LTV divided by blended CAC (total spend ÷ total customers)

@@ -90,19 +90,21 @@ brand,2024-01-01,10
 `
 
 async function uploadDataset(page: Page, dataset: string, csv: string) {
-  const datasetSelect = page.getByTestId('dataset-select')
-  await expect(datasetSelect).toBeVisible({ timeout: 15000 })
-  await datasetSelect.selectOption(dataset)
   const fileInput = page.getByTestId('dataset-file-input')
   await fileInput.setInputFiles({
     name: `${dataset}.csv`,
     mimeType: 'text/csv',
     buffer: Buffer.from(csv),
   })
+  const modal = page.locator('.import-modal')
+  await expect(modal).toBeVisible({ timeout: 15000 })
+  const datasetSelect = page.getByTestId('dataset-select')
+  await datasetSelect.selectOption(dataset)
   await page.getByTestId('import-submit').click()
   await expect(page.getByTestId('import-status')).toBeVisible({
     timeout: 20000,
   })
+  await page.getByRole('button', { name: 'Close' }).click()
 }
 
 async function resetStorage(page: Page) {
@@ -149,7 +151,7 @@ async function createProject(page: Page, name = 'E2E Ratio Lab') {
 
 async function completeDataIntake(page: Page) {
   await page.getByTestId('nav-import').click()
-  await expect(page.getByRole('heading', { name: 'Import wizard' })).toBeVisible({ timeout: 15000 })
+  await expect(page.getByRole('heading', { name: /get your data in/i })).toBeVisible({ timeout: 15000 })
   await uploadDataset(page, 'customers', customers)
   await uploadDataset(page, 'transactions', transactions)
   await uploadDataset(page, 'channels', channels)

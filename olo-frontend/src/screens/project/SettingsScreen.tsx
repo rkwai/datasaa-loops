@@ -87,128 +87,133 @@ export function SettingsScreen() {
   }
 
   return (
-    <div>
-      <div className="page-header">
-        <div>
-          <h1>Model settings</h1>
-          <p className="page-description">
-            Fine-tune definitions per project. Changes stay local to this browser profile.
-          </p>
-        </div>
-        {message && <span className="pill">{message}</span>}
-      </div>
-
-      <form className="surface" style={{ borderRadius: 28 }} onSubmit={handleSave}>
-        <h3 style={{ marginTop: 0 }}>LTV + churn</h3>
-        <div className="split">
-          <div>
-            <label htmlFor="settings-ltv-window">LTV window (days)</label>
-            <input
-              id="settings-ltv-window"
-              type="number"
-              value={ltvWindowDays}
-              placeholder="All time"
-              onChange={(e) => setLtvWindowDays(e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="settings-churn-events">Churn event types (comma separated)</label>
-            <input
-              id="settings-churn-events"
-              value={churnEvents}
-              onChange={(e) => setChurnEvents(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <h3 className="section-title" style={{ marginTop: '2rem' }}>
-          Segmentation
-        </h3>
-        <div className="split">
-          <div>
-            <label htmlFor="settings-segment-high">Segment high quantile</label>
-            <input
-              id="settings-segment-high"
-              value={segmentHigh}
-              onChange={(e) => setSegmentHigh(e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="settings-segment-mid">Segment mid quantile</label>
-            <input
-              id="settings-segment-mid"
-              value={segmentMid}
-              onChange={(e) => setSegmentMid(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <h3 className="section-title" style={{ marginTop: '2rem' }}>
+    <div className="settings-shell">
+      <aside className="settings-nav">
+        <a href="#general" className="active">
+          <span className="material-symbols-outlined">tune</span>
+          General
+          <span className="material-symbols-outlined">chevron_right</span>
+        </a>
+        <a href="#ltv">
+          <span className="material-symbols-outlined">monetization_on</span>
+          LTV definition
+          <span className="material-symbols-outlined">chevron_right</span>
+        </a>
+        <a href="#cac">
+          <span className="material-symbols-outlined">attribution</span>
           CAC & attribution
-        </h3>
-        <div className="split">
-          <div>
-            <label htmlFor="settings-cac-source">CAC spend source</label>
-            <select
-              id="settings-cac-source"
-              value={cacSource}
-              onChange={(e) =>
-                setCacSource(
-                  e.target.value === 'daily' ? 'daily' : 'channel_total',
-                )
-              }
-            >
-              <option value="daily">Daily spend table</option>
-              <option value="channel_total">Channel total budget</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="settings-attribution">Attribution mode</label>
-            <select
-              id="settings-attribution"
-              value={attribution}
-              onChange={(e) =>
-                setAttribution(
-                  e.target.value === 'acquired_via'
-                    ? 'acquired_via'
-                    : 'channel_field',
-                )
-              }
-            >
-              <option value="channel_field">Customer.channelSourceId</option>
-              <option value="acquired_via">Acquired_Via edges</option>
-            </select>
-          </div>
-        </div>
+          <span className="material-symbols-outlined">chevron_right</span>
+        </a>
+        <a href="#segmentation">
+          <span className="material-symbols-outlined">segment</span>
+          Segment rules
+          <span className="material-symbols-outlined">chevron_right</span>
+        </a>
+        <a href="#data">
+          <span className="material-symbols-outlined">database</span>
+          Data management
+          <span className="material-symbols-outlined">chevron_right</span>
+        </a>
+      </aside>
 
-        <h3 className="section-title" style={{ marginTop: '2rem' }}>
-          Locale defaults
-        </h3>
-        <div className="split">
+      <form className="settings-main" onSubmit={handleSave}>
+        <header className="settings-hero">
           <div>
-            <label htmlFor="settings-currency">Currency</label>
-            <input
-              id="settings-currency"
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-            />
+            <h1>App settings</h1>
+            <p>Fine-tune definitions per project. Changes stay local to this browser profile.</p>
           </div>
-          <div>
-            <label htmlFor="settings-timezone">Timezone</label>
-            <input
-              id="settings-timezone"
-              value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-            />
+          <div className="settings-hero-actions">
+            {message && <span className="pill">{message}</span>}
+            <button type="submit">Save changes</button>
           </div>
-        </div>
+        </header>
 
-        <div style={{ marginTop: '2rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <button type="submit">Save settings</button>
-          <button type="button" className="secondary" onClick={handleClearData}>
-            Clear local data
-          </button>
-        </div>
+        <section id="general" className="settings-section">
+          <h2>General preferences</h2>
+          <div className="settings-card grid">
+            <label>
+              <span>Currency</span>
+              <input value={currency} onChange={(e) => setCurrency(e.target.value)} />
+            </label>
+            <label>
+              <span>Timezone</span>
+              <input value={timezone} onChange={(e) => setTimezone(e.target.value)} />
+            </label>
+          </div>
+        </section>
+
+        <section id="ltv" className="settings-section">
+          <h2>LTV definition</h2>
+          <div className="settings-card">
+            <label>
+              <span>LTV window (days)</span>
+              <input
+                type="number"
+                value={ltvWindowDays}
+                placeholder="All time"
+                onChange={(e) => setLtvWindowDays(e.target.value)}
+              />
+            </label>
+            <label>
+              <span>Churn event types (comma separated)</span>
+              <input value={churnEvents} onChange={(e) => setChurnEvents(e.target.value)} />
+            </label>
+          </div>
+        </section>
+
+        <section id="cac" className="settings-section">
+          <h2>CAC & attribution</h2>
+          <div className="settings-card grid">
+            <label>
+              <span>CAC spend source</span>
+              <select value={cacSource} onChange={(e) => setCacSource(e.target.value === 'daily' ? 'daily' : 'channel_total')}>
+                <option value="daily">Daily spend table</option>
+                <option value="channel_total">Channel total budget</option>
+              </select>
+            </label>
+            <label>
+              <span>Attribution mode</span>
+              <select
+                value={attribution}
+                onChange={(e) =>
+                  setAttribution(e.target.value === 'acquired_via' ? 'acquired_via' : 'channel_field')
+                }
+              >
+                <option value="channel_field">Customer.channelSourceId</option>
+                <option value="acquired_via">Acquired_Via edges</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section id="segmentation" className="settings-section">
+          <h2>Segment rules</h2>
+          <div className="settings-card grid">
+            <label>
+              <span>Segment high quantile</span>
+              <input value={segmentHigh} onChange={(e) => setSegmentHigh(e.target.value)} />
+            </label>
+            <label>
+              <span>Segment mid quantile</span>
+              <input value={segmentMid} onChange={(e) => setSegmentMid(e.target.value)} />
+            </label>
+          </div>
+        </section>
+
+        <section id="data" className="settings-section">
+          <h2>Data management</h2>
+          <div className="settings-card data">
+            <div>
+              <p>Clear local data</p>
+              <span>
+                This deletes all locally cached campaign, customer, and event data. Configuration settings are preserved.
+              </span>
+            </div>
+            <button type="button" className="ghost" onClick={handleClearData}>
+              Clear data
+            </button>
+          </div>
+        </section>
       </form>
     </div>
   )

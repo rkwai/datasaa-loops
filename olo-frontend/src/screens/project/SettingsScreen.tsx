@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import { useProjectContext } from '../../context/ProjectContext'
+import { useProjectContext } from '../../context/useProjectContext'
+
+const scheduleStateUpdate = (fn: () => void) => {
+  if (typeof queueMicrotask === 'function') {
+    queueMicrotask(fn)
+  } else {
+    Promise.resolve().then(fn)
+  }
+}
 
 export function SettingsScreen() {
   const { config, updateConfig, db, projectId } = useProjectContext()
@@ -16,14 +24,16 @@ export function SettingsScreen() {
 
   useEffect(() => {
     if (!config) return
-    setLtvWindowDays(config.ltvWindowDays?.toString() ?? '')
-    setChurnEvents(config.churnEventTypes.join(', '))
-    setSegmentHigh(config.segmentHighQuantile.toString())
-    setSegmentMid(config.segmentMidQuantile.toString())
-    setCacSource(config.cacSpendSource)
-    setAttribution(config.attributionMode)
-    setCurrency(config.defaultCurrency)
-    setTimezone(config.timezone)
+    scheduleStateUpdate(() => {
+      setLtvWindowDays(config.ltvWindowDays?.toString() ?? '')
+      setChurnEvents(config.churnEventTypes.join(', '))
+      setSegmentHigh(config.segmentHighQuantile.toString())
+      setSegmentMid(config.segmentMidQuantile.toString())
+      setCacSource(config.cacSpendSource)
+      setAttribution(config.attributionMode)
+      setCurrency(config.defaultCurrency)
+      setTimezone(config.timezone)
+    })
   }, [config])
 
   async function handleSave(e: FormEvent) {
@@ -142,7 +152,11 @@ export function SettingsScreen() {
             <select
               id="settings-cac-source"
               value={cacSource}
-              onChange={(e) => setCacSource(e.target.value as any)}
+              onChange={(e) =>
+                setCacSource(
+                  e.target.value === 'daily' ? 'daily' : 'channel_total',
+                )
+              }
             >
               <option value="daily">Daily spend table</option>
               <option value="channel_total">Channel total budget</option>
@@ -153,7 +167,13 @@ export function SettingsScreen() {
             <select
               id="settings-attribution"
               value={attribution}
-              onChange={(e) => setAttribution(e.target.value as any)}
+              onChange={(e) =>
+                setAttribution(
+                  e.target.value === 'acquired_via'
+                    ? 'acquired_via'
+                    : 'channel_field',
+                )
+              }
             >
               <option value="channel_field">Customer.channelSourceId</option>
               <option value="acquired_via">Acquired_Via edges</option>

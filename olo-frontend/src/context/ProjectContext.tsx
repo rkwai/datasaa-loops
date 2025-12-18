@@ -1,19 +1,9 @@
-import { createContext, useContext, useMemo } from 'react'
+import { useMemo } from 'react'
 import type { PropsWithChildren } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { getProjectDb } from '../db/projectDb'
-import type { ProjectDatabase } from '../db/projectDb'
-import type { ProjectMetaRecord, ModelConfigRecord } from '../db/types'
-
-interface ProjectContextValue {
-  projectId: string
-  db: ProjectDatabase
-  meta: ProjectMetaRecord
-  config?: ModelConfigRecord
-  updateConfig: (patch: Partial<ModelConfigRecord>) => Promise<void>
-}
-
-const ProjectContext = createContext<ProjectContextValue | null>(null)
+import type { ProjectMetaRecord } from '../db/types'
+import { ProjectContext, type ProjectContextValue } from './useProjectContext'
 
 interface ProjectProviderProps extends PropsWithChildren {
   projectId: string
@@ -41,12 +31,4 @@ export function ProjectProvider({ projectId, meta, children }: ProjectProviderPr
   )
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
-}
-
-export function useProjectContext() {
-  const ctx = useContext(ProjectContext)
-  if (!ctx) {
-    throw new Error('useProjectContext must be used inside ProjectProvider')
-  }
-  return ctx
 }

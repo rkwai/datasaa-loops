@@ -161,3 +161,80 @@
 {"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1765968687909,"sessionId":"debug-session","hypothesisId":"B"}
 {"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1765968687909,"sessionId":"debug-session","hypothesisId":"B"}
 {"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1765968687910,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025816999,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":false},"timestamp":1766025817011,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817012,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":false},"timestamp":1766025817012,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817022,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817022,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817023,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817023,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817175,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":false},"timestamp":1766025817175,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817175,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":false},"timestamp":1766025817175,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817187,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":false},"timestamp":1766025817187,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817188,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":false},"timestamp":1766025817188,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817191,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817192,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817192,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817192,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817218,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817219,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817219,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817220,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817225,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817225,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817226,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817226,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817246,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817246,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817247,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817247,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817272,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817273,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817273,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817274,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817279,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817279,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766025817279,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766025817280,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026230305,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":false},"timestamp":1766026230318,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026230319,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":false},"timestamp":1766026230319,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026230355,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026230356,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026230356,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026230356,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231652,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231669,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":false},"timestamp":1766026231669,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231670,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":false},"timestamp":1766026231670,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231674,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231674,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231675,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231675,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231711,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231711,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231711,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231712,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231719,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231719,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231720,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231720,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231748,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231748,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231749,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231749,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231779,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231779,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231780,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231780,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231786,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231787,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:10","message":"ProjectHome component rendered","data":{},"timestamp":1766026231787,"sessionId":"debug-session","hypothesisId":"B"}
+{"location":"ProjectHome.tsx:69","message":"ProjectHome return/render","data":{"projectsLoaded":true},"timestamp":1766026231788,"sessionId":"debug-session","hypothesisId":"B"}

@@ -1,13 +1,22 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { nanoid } from 'nanoid'
-import { useProjectContext } from '../../context/ProjectContext'
+import { useProjectContext } from '../../context/useProjectContext'
 import type { ActionPlanItem, ActionPlanRecord } from '../../db/types'
 import { generateRecommendations } from '../../utils/spendPlan'
 
+const scheduleStateUpdate = (fn: () => void) => {
+  if (typeof queueMicrotask === 'function') {
+    queueMicrotask(fn)
+  } else {
+    Promise.resolve().then(fn)
+  }
+}
+
 export function SpendPlanScreen() {
   const { db, projectId } = useProjectContext()
-  const channelMetrics = useLiveQuery(() => db.channelMetrics.toArray(), [db]) ?? []
+  const liveChannelMetrics = useLiveQuery(() => db.channelMetrics.toArray(), [db])
+  const channelMetrics = useMemo(() => liveChannelMetrics ?? [], [liveChannelMetrics])
   const plans = useLiveQuery(() => db.actionPlans.orderBy('createdAt').reverse().toArray(), [db]) ?? []
   const [objective, setObjective] = useState('Increase HIGH segment efficiency')
   const [items, setItems] = useState<ActionPlanItem[]>([])
@@ -16,10 +25,12 @@ export function SpendPlanScreen() {
 
   useEffect(() => {
     if (!channelMetrics.length) {
-      setItems([])
+      scheduleStateUpdate(() => setItems([]))
       return
     }
-    setItems(generateRecommendations(channelMetrics))
+    scheduleStateUpdate(() =>
+      setItems(generateRecommendations(channelMetrics)),
+    )
   }, [channelMetrics])
 
   const totalCurrentSpend = useMemo(

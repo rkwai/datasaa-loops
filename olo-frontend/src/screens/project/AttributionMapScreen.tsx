@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useProjectContext } from '../../context/ProjectContext'
+import { useProjectContext } from '../../context/useProjectContext'
 import type { SegmentKey } from '../../db/types'
 
 const SEGMENT_COLORS: Record<SegmentKey, string> = {
@@ -18,9 +18,18 @@ interface EdgeInfo {
 
 export function AttributionMapScreen() {
   const { db } = useProjectContext()
-  const channelMetrics = useLiveQuery(() => db.channelMetrics.toArray(), [db]) ?? []
-  const customers = useLiveQuery(() => db.customers.toArray(), [db]) ?? []
-  const customerMetrics = useLiveQuery(() => db.customerMetrics.toArray(), [db]) ?? []
+  const liveChannelMetrics = useLiveQuery(() => db.channelMetrics.toArray(), [db])
+  const liveCustomers = useLiveQuery(() => db.customers.toArray(), [db])
+  const liveCustomerMetrics = useLiveQuery(() => db.customerMetrics.toArray(), [db])
+  const channelMetrics = useMemo(
+    () => liveChannelMetrics ?? [],
+    [liveChannelMetrics],
+  )
+  const customers = useMemo(() => liveCustomers ?? [], [liveCustomers])
+  const customerMetrics = useMemo(
+    () => liveCustomerMetrics ?? [],
+    [liveCustomerMetrics],
+  )
   const [selectedEdge, setSelectedEdge] = useState<EdgeInfo | null>(null)
 
   const edges = useMemo(() => {

@@ -32,20 +32,23 @@ export function ProjectShell() {
 
   useEffect(() => {
     if (!projectId) return
-    const nav: typeof navigator & { locks?: any } = navigator as any
-    if (!nav.locks?.request) return
+    const lockManager = (navigator as Navigator & { locks?: LockManager }).locks
+    if (!lockManager?.request) return
     let release: (() => void) | null = null
-    nav.locks
-      .request(`olo-project-${projectId}`, { ifAvailable: true }, (lock: any) => {
-        if (!lock) {
-          setHasWriteLock(false)
-          return new Promise<void>(() => {})
-        }
-        setHasWriteLock(true)
-        return new Promise<void>((resolve) => {
-          release = resolve
-        })
-      })
+    lockManager
+      .request(
+        `olo-project-${projectId}`,
+        { ifAvailable: true },
+        (lock) =>
+          new Promise<void>((resolve) => {
+            if (!lock) {
+              setHasWriteLock(false)
+              return
+            }
+            setHasWriteLock(true)
+            release = resolve
+          }),
+      )
       .catch(() => setHasWriteLock(true))
     return () => {
       release?.()

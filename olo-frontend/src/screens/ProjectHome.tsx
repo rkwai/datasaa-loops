@@ -62,7 +62,9 @@ export function ProjectHome() {
       setError('Import failed')
     } finally {
       setSubmitting(false)
-      fileInputRef.current && (fileInputRef.current.value = '')
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
   }
 

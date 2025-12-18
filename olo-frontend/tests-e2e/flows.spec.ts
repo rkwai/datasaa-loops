@@ -1,4 +1,6 @@
-import { test, expect } from '@playwright/test'
+/// <reference lib="dom" />
+
+import { test, expect, type Page } from '@playwright/test'
 
 const customersCsv = `customerId,acquisitionDate,channelSourceId
 cust_high,2024-01-01,paid
@@ -20,21 +22,23 @@ paid,2024-01-01,40
 brand,2024-01-01,10
 `
 
-async function uploadDataset(page, dataset, csv) {
-  const datasetSelect = page.locator('#dataset-select')
+async function uploadDataset(page: Page, dataset: string, csv: string) {
+  const datasetSelect = page.getByTestId('dataset-select')
   await expect(datasetSelect).toBeVisible({ timeout: 15000 })
   await datasetSelect.selectOption(dataset)
-  const fileInput = page.locator('#dataset-file-input')
+  const fileInput = page.getByTestId('dataset-file-input')
   await fileInput.setInputFiles({
     name: `${dataset}.csv`,
     mimeType: 'text/csv',
     buffer: Buffer.from(csv),
   })
-  await page.getByRole('button', { name: 'Commit import' }).click()
-  await expect(page.getByText('All data processed!').first()).toBeVisible({ timeout: 20000 })
+  await page.getByTestId('import-submit').click()
+  await expect(page.getByTestId('import-status')).toBeVisible({
+    timeout: 20000,
+  })
 }
 
-async function resetStorage(page) {
+async function resetStorage(page: Page) {
   await page.goto('/')
   await page.evaluate(async () => {
     if ('databases' in indexedDB && typeof indexedDB.databases === 'function') {
@@ -66,7 +70,7 @@ const transactions = transactionsCsv
 const channels = channelsCsv
 const spend = spendCsv
 
-async function createProject(page, name = 'E2E Ratio Lab') {
+async function createProject(page: Page, name = 'E2E Ratio Lab') {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Operational Loop Optimizer' })).toBeVisible()
   await page.getByLabel('Project name').fill(name)
@@ -76,7 +80,7 @@ async function createProject(page, name = 'E2E Ratio Lab') {
   await expect(page).toHaveURL(/\/project\//)
 }
 
-async function completeDataIntake(page) {
+async function completeDataIntake(page: Page) {
   await page.getByTestId('nav-import').click()
   await expect(page.getByRole('heading', { name: 'Import wizard' })).toBeVisible({ timeout: 15000 })
   await uploadDataset(page, 'customers', customers)

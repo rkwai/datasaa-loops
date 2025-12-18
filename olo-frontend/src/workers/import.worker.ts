@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
 import Papa from 'papaparse'
+import type { Table } from 'dexie'
 import { getProjectDb } from '../db/projectDb'
 import type {
   DatasetType,
@@ -42,19 +43,21 @@ async function runImport(payload: ImportJobPayload) {
 
   await updateJob({ phase: 'parsing' })
 
+  const targetTable = db.table(payload.dataset as string) as Table<unknown, unknown>
+
   for (let i = 0; i < rows.length; i += chunkSize) {
     const chunk = rows.slice(i, i + chunkSize)
-    const mapped = chunk
-      .map((row, index) =>
-        mapRowToRecord(payload.dataset, row, payload.mapping, i + index + 1, warnings),
-      )
-      .filter(Boolean)
+    const mapped = chunk.map((row, index) =>
+      mapRowToRecord(payload.dataset, row, payload.mapping, i + index + 1, warnings),
+    )
+    const valid = mapped.filter(
+      (record): record is Exclude<typeof record, null> => record !== null,
+    )
 
-    await db.transaction('rw', db.table(payload.dataset as string), async () => {
-      const table = db.table(payload.dataset as string)
-      await table.bulkPut(mapped as any[])
+    await db.transaction('rw', targetTable, async () => {
+      await targetTable.bulkPut(valid as unknown[])
     })
-    processed += mapped.length
+    processed += valid.length
     await updateJob({ phase: `writing (${processed}/${total})` })
 
     ctx.postMessage({

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useProjectContext } from '../../context/ProjectContext'
+import { useProjectContext } from '../../context/useProjectContext'
 import type { AuditLogRecord } from '../../db/types'
 
 const FILTERS = [

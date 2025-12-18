@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useProjectContext } from '../../context/ProjectContext'
+import { useProjectContext } from '../../context/useProjectContext'
 import type { SegmentKey } from '../../db/types'
 import { nanoid } from 'nanoid'
 import { runComputeJob } from '../../utils/workers'

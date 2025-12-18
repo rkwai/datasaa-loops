@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { NavLink, Outlet, useParams } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { metaDb, touchProject } from '../../db/metaDb'
 import { ProjectProvider } from '../../context/ProjectContext'
+import { AppHeader } from '../../components/AppHeader'
+import { AppFooter } from '../../components/AppFooter'
 
 const NAV_ITEMS = [
   { to: 'dashboard', label: 'LTV ↔ CAC view' },
@@ -18,6 +20,7 @@ export function ProjectShell() {
   const params = useParams<{ projectId: string }>()
   const projectId = params.projectId
   const [hasWriteLock, setHasWriteLock] = useState(true)
+  const navigate = useNavigate()
 
   const meta = useLiveQuery(async () => {
     if (!projectId) return undefined
@@ -122,5 +125,26 @@ export function ProjectShell() {
     )
   }, [projectId, meta, loading, hasWriteLock])
 
-  return content
+  const headerActions = (
+    <>
+      <button className="secondary" type="button" onClick={() => navigate('/')}>
+        Projects
+      </button>
+      <button
+        className="secondary"
+        type="button"
+        onClick={() => projectId && navigate(`/project/${projectId}/settings`)}
+      >
+        Settings
+      </button>
+    </>
+  )
+
+  return (
+    <div className="app-shell">
+      <AppHeader actions={headerActions} searchPlaceholder="Search workspace…" />
+      <main className="app-main">{content}</main>
+      <AppFooter />
+    </div>
+  )
 }

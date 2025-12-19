@@ -67,7 +67,7 @@ This document captures the exact behavior that ships today. The app is a fronten
 | 9 | Crash recovery for jobs | **Not implemented** – jobs table tracks state but UI lacks resume/rollback controls. |
 | 10 | Multi-tab safety | **Tested (vitest)** – “touches projects to support multi-tab awareness”. |
 
-Automated regression coverage lives in `src/__tests__/flows.spec.ts` (Vitest) and `tests-e2e/flows.spec.ts` (Playwright). Run `npm run test` for the unit suite and `npm run test:e2e` for the UI flows.
+Automated regression coverage lives in `src/__tests__/flows.spec.ts` (Vitest) and `tests-e2e/flows.spec.ts` (Playwright). The KPI-to-test mapping is documented in [`testing-spec.md`](../testing-spec.md). Run `npm run test` for the unit suite and `npm run test:e2e` for the UI flows.
 
 ## 6. Export Formats
 

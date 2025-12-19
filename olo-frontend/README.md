@@ -69,9 +69,9 @@ npm run test:e2e   # Playwright user-flow coverage (needs ability to start a loc
 - **Action plans**: CSV schema matches `plan_id, created_at, objective, channel_id, current_spend, proposed_spend, delta, rationale, model_version`. JSON exports include the full nested payload.
 - **Metrics CSVs**: Customer/channel/segment materializations download individually from the Export screen.
 
-## User flows
+## User flows & docs
 
-See `docs/user-flows.md` for the four supported journeys (data intake → compute, LTV↔CAC diagnosis, budget shift, and governance/export) that map directly to the screens described above and the `layout.html` mock-up.
+See [`docs/spec.md`](../docs/spec.md) for the end-to-end implementation details and [`docs/user-flows.md`](../docs/user-flows.md) for the CAC↔LTV journeys (data intake → compute, diagnosis, budget shift, governance/export). Testing coverage for each KPI-driven flow is summarized in [`testing-spec.md`](../testing-spec.md) and linked to the relevant unit (`src/__tests__/flows.spec.ts`) and e2e (`tests-e2e/flows.spec.ts`) suites.
 
 ## Limitations
 

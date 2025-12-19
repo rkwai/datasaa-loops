@@ -24,4 +24,4 @@ These flows mirror the structure shown in `docs/mock-ups/layout.html` and are fu
 3. Visit **Exports** to create ZIP bundles (manifest + JSONL) and download metrics CSVs; import them later from Project Home.
 4. Multitab safety ensures only one tab writes at once (others are read-only) and every project lists last-opened time.
 
-These flows represent the end-to-end journey required to measure and improve the LTV:CAC ratio for high-value segments, staying faithful to the provided mock-ups.
+These flows represent the end-to-end journey required to measure and improve the LTV:CAC ratio for high-value segments, staying faithful to the provided mock-ups. See [`testing-spec.md`](../testing-spec.md) for how each flow’s KPIs map to the automated unit and e2e suites.

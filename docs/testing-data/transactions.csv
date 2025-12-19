@@ -1,0 +1,3 @@
+transactionId,customerId,revenueAmount,date
+t1,cust_high,320,2024-01-03
+t2,cust_mid,80,2024-01-04

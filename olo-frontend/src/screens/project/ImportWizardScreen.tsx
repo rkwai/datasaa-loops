@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import { useMemo, useRef, useState } from 'react'
-import type { DragEvent, FormEvent } from 'react'
+import type { FormEvent } from 'react'
 import { nanoid } from 'nanoid'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useProjectContext } from '../../context/useProjectContext'
@@ -18,7 +18,6 @@ export function ImportWizardScreen() {
   const [status, setStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isRunning, setIsRunning] = useState(false)
-  const [isDragActive, setIsDragActive] = useState(false)
   const [showMappingModal, setShowMappingModal] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
@@ -99,25 +98,6 @@ export function ImportWizardScreen() {
 
   function triggerFilePicker() {
     fileInputRef.current?.click()
-  }
-
-  function handleDragOver(event: DragEvent<HTMLDivElement>) {
-    event.preventDefault()
-    setIsDragActive(true)
-  }
-
-  function handleDragLeave(event: DragEvent<HTMLDivElement>) {
-    event.preventDefault()
-    setIsDragActive(false)
-  }
-
-  function handleDrop(event: DragEvent<HTMLDivElement>) {
-    event.preventDefault()
-    setIsDragActive(false)
-    const droppedFile = event.dataTransfer.files?.[0]
-    if (droppedFile) {
-      handleFileChange(droppedFile)
-    }
   }
 
   function handleDownloadTemplate() {
@@ -217,72 +197,67 @@ export function ImportWizardScreen() {
               </span>
             )}
           </div>
-          <div
-            className={`import-drop-zone${isDragActive ? ' drag-active' : ''}`}
-            onClick={triggerFilePicker}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <div className="import-drop-icon">
-              <span className="material-symbols-outlined" style={{ fontSize: '3rem' }}>
-                cloud_upload
-              </span>
-            </div>
-            <div className="import-drop-copy">
-              <h3>Drag & drop your CSV here</h3>
-              <p>or browse to upload from your computer. Supports CSV up to 50MB.</p>
-              {file && (
-                <p style={{ marginTop: '0.35rem' }}>
-                  Selected: <strong>{file.name}</strong>
+          <input
+            ref={fileInputRef}
+            id="dataset-file-input"
+            data-testid="dataset-file-input"
+            type="file"
+            accept=".csv,text/csv"
+            onChange={(e) => handleFileChange(e.target.files?.[0])}
+            style={{ display: 'none' }}
+          />
+          <section className="import-dataset-table">
+            <div className="import-table-header">
+              <div className="import-table-icon" aria-hidden="true">
+                <span className="material-symbols-outlined">cloud_upload</span>
+              </div>
+              <div>
+                <h3 style={{ margin: 0 }}>Import datasets</h3>
+                <p className="page-description" style={{ margin: '0.2rem 0 0' }}>
+                  Map, preview, and save each dataset to rerun the CAC↔LTV pipeline.
                 </p>
-              )}
+              </div>
             </div>
-            <button type="button" className="accent-button">
-              <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>
-                folder_open
-              </span>
-              Select CSV file
-            </button>
-            <input
-              ref={fileInputRef}
-              id="dataset-file-input"
-              data-testid="dataset-file-input"
-              type="file"
-              accept=".csv,text/csv"
-              onChange={(e) => handleFileChange(e.target.files?.[0])}
-              style={{ display: 'none' }}
-            />
-          </div>
-          <section className="import-status-grid">
-            {datasetCards.map((card) => (
-              <article
-                key={card.type}
-                className={`import-status-card${card.isRecentlyUpdated ? ' highlighted' : ''}`}
-              >
-                <div>
-                  <p className="status-label">
-                    {card.title} {card.optional && <span className="tag optional">Optional</span>}
-                  </p>
-                  <p className="page-description" style={{ margin: '0.2rem 0 0' }}>
-                    {card.description}
-                  </p>
-                  <p className={`status-date${card.isRecentlyUpdated ? ' highlight' : ''}`}>
-                    {card.lastImportedLabel ?? 'Not imported yet'}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="secondary"
-                  onClick={() => {
-                    setDataset(card.type)
-                    triggerFilePicker()
-                  }}
-                >
-                  Import {card.title}
-                </button>
-              </article>
-            ))}
+            <div className="import-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Dataset</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {datasetCards.map((card) => (
+                    <tr key={card.type}>
+                      <td>
+                        {card.title} {card.optional && <span className="tag optional">Optional</span>}
+                      </td>
+                      <td className="page-description">{card.description}</td>
+                      <td className={card.isRecentlyUpdated ? 'status-date highlight' : 'status-date'}>
+                        {card.lastImportedLabel ?? 'Not imported yet'}
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        <button
+                          type="button"
+                          className="accent-button primary"
+                          onClick={() => {
+                            setDataset(card.type)
+                            triggerFilePicker()
+                          }}
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>
+                            folder_open
+                          </span>
+                          Import
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </section>
 
           <div className="import-cards-row">

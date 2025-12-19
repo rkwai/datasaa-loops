@@ -5,13 +5,10 @@ import { useProjectContext } from '../../context/useProjectContext'
 import type { SegmentKey } from '../../db/types'
 import { runComputeJob } from '../../utils/workers'
 
-type KpiTone = 'positive' | 'negative' | 'neutral'
-
 type KpiCard = {
   label: string
   value: string
   change: string
-  tone: KpiTone
   icon: string
   testId: string
 }
@@ -26,6 +23,13 @@ export function SegmentDashboard() {
   const ltvToCacRatio = totalSpend > 0 ? totalRevenue / totalSpend : 0
   const avgLtv = totalCustomers ? totalRevenue / totalCustomers : 0
   const topSegment = [...segmentMetrics].sort((a, b) => b.avgLtv - a.avgLtv)[0]
+  const ratioTone = getRatioTone(ltvToCacRatio)
+  const ratioStatus =
+    ltvToCacRatio >= 3
+      ? 'Healthy loop'
+      : ltvToCacRatio <= 1
+        ? 'Critical: CAC too high'
+        : 'Watch your CAC spend'
 
   const [selectedSegment, setSelectedSegment] = useState<SegmentKey | 'ALL'>('ALL')
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null)
@@ -90,20 +94,21 @@ export function SegmentDashboard() {
     maximumFractionDigits: 0,
   })
 
+  const blendedCac = totalSpend > 0 && totalCustomers > 0 ? totalSpend / totalCustomers : null
+
+  const ratioKpi = {
+    label: 'LTV : CAC ratio',
+    value: Number.isFinite(ltvToCacRatio) ? ltvToCacRatio.toFixed(2) : '—',
+    change: ratioStatus,
+    icon: 'equalizer',
+    testId: 'kpi-ltv-cac',
+  }
+
   const primaryKpis: KpiCard[] = [
-    {
-      label: 'LTV : CAC ratio',
-      value: Number.isFinite(ltvToCacRatio) ? ltvToCacRatio.toFixed(2) : '—',
-      change: ltvToCacRatio >= 3 ? 'On target' : 'Needs attention',
-      tone: ltvToCacRatio >= 3 ? 'positive' : 'negative',
-      icon: 'equalizer',
-      testId: 'kpi-ltv-cac',
-    },
     {
       label: 'Top segment',
       value: topSegment ? `${topSegment.segmentKey}` : '—',
       change: topSegment ? `${Math.round(topSegment.avgLtv)} avg LTV` : 'Import data to begin',
-      tone: 'neutral',
       icon: 'pie_chart',
       testId: 'kpi-top-segment',
     },
@@ -114,7 +119,6 @@ export function SegmentDashboard() {
       label: 'Total customers',
       value: totalCustomers.toLocaleString(),
       change: '+12%',
-      tone: 'positive',
       icon: 'group',
       testId: 'kpi-total-customers',
     },
@@ -122,7 +126,6 @@ export function SegmentDashboard() {
       label: 'Total revenue',
       value: currencyFormatter.format(totalRevenue),
       change: '+8%',
-      tone: 'positive',
       icon: 'payments',
       testId: 'kpi-total-revenue',
     },
@@ -130,7 +133,6 @@ export function SegmentDashboard() {
       label: 'Avg LTV',
       value: currencyFormatter.format(avgLtv),
       change: '-2%',
-      tone: 'negative',
       icon: 'loyalty',
       testId: 'kpi-avg-ltv',
     },
@@ -138,7 +140,6 @@ export function SegmentDashboard() {
       label: 'Spend captured',
       value: currencyFormatter.format(totalSpend),
       change: healthiestChannel ? `${healthiestChannel.channelId} leading ratio` : 'Awaiting data',
-      tone: 'neutral',
       icon: 'bolt',
       testId: 'kpi-spend-captured',
     },
@@ -149,7 +150,7 @@ export function SegmentDashboard() {
       <section className="dashboard-hero-panel">
         <div>
           <div className="dashboard-chip">Analytics</div>
-          <h1>Segment overview</h1>
+          <h1>Increase LTV to Acquire More Customers</h1>
           <p>
             Know your blended LTV↔CAC and the segments that keep it healthy. Explore the loops driving high-value cohorts, or
             add data to diagnose new ones.
@@ -191,12 +192,16 @@ export function SegmentDashboard() {
       </div>
 
       <section className="dashboard-kpis primary-row">
+        <article className={`dashboard-kpi-card ltv-kpi tone-${ratioTone}`} data-testid={ratioKpi.testId}>
+          <div className="kpi-icon">
+            <span className="material-symbols-outlined">{ratioKpi.icon}</span>
+          </div>
+          <p className="kpi-label">{ratioKpi.label}</p>
+          <strong className="kpi-value">{ratioKpi.value}</strong>
+          <span className="kpi-change">{ratioKpi.change}</span>
+        </article>
         {primaryKpis.map((kpi) => (
-          <article
-            key={kpi.label}
-            className={`dashboard-kpi-card tone-${kpi.tone}`}
-            data-testid={kpi.testId}
-          >
+          <article key={kpi.label} className="dashboard-kpi-card" data-testid={kpi.testId}>
             <div className="kpi-icon">
               <span className="material-symbols-outlined">{kpi.icon}</span>
             </div>
@@ -211,7 +216,7 @@ export function SegmentDashboard() {
         {secondaryKpis.map((kpi) => (
           <article
             key={kpi.label}
-            className={`dashboard-kpi-card tone-${kpi.tone}`}
+            className="dashboard-kpi-card"
             data-testid={kpi.testId}
           >
             <div className="kpi-icon">
@@ -250,27 +255,31 @@ export function SegmentDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {segmentMetrics.map((segment) => (
-                  <tr key={segment.segmentKey}>
-                    <td>
-                      <button
-                        className={selectedSegment === segment.segmentKey ? 'pill-button active' : 'pill-button'}
-                        type="button"
-                        onClick={() => setSelectedSegment(segment.segmentKey)}
-                      >
-                        {segment.segmentKey}
-                      </button>
-                    </td>
-                    <td>{segment.customerCount.toLocaleString()}</td>
-                    <td>{currencyFormatter.format(segment.avgLtv)}</td>
-                    <td>
-                      {totalSpend > 0 && totalCustomers > 0
-                        ? (segment.avgLtv / (totalSpend / totalCustomers)).toFixed(2)
-                        : '—'}
-                    </td>
-                    <td>{currencyFormatter.format(segment.totalRevenue)}</td>
-                  </tr>
-                ))}
+                {segmentMetrics.map((segment) => {
+                  const segmentRatio =
+                    blendedCac && blendedCac > 0 ? Number((segment.avgLtv / blendedCac).toFixed(2)) : null
+                  const segmentTone = segmentRatio ? getRatioTone(segmentRatio) : null
+                  const buttonClass = ['pill-button']
+                  if (selectedSegment === segment.segmentKey) buttonClass.push('active')
+                  if (segmentTone) buttonClass.push(`tone-${segmentTone}`)
+                  return (
+                    <tr key={segment.segmentKey}>
+                      <td>
+                        <button
+                          className={buttonClass.join(' ')}
+                          type="button"
+                          onClick={() => setSelectedSegment(segment.segmentKey)}
+                        >
+                          {segment.segmentKey}
+                        </button>
+                      </td>
+                      <td>{segment.customerCount.toLocaleString()}</td>
+                      <td>{currencyFormatter.format(segment.avgLtv)}</td>
+                      <td>{segmentRatio ? segmentRatio.toFixed(2) : '—'}</td>
+                      <td>{currencyFormatter.format(segment.totalRevenue)}</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -304,26 +313,32 @@ export function SegmentDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {channelRatios.map((channel) => (
-                  <tr key={channel.channelId}>
-                    <td>
-                      <button
-                        className={selectedChannel === channel.channelId ? 'pill-button active' : 'pill-button'}
-                        type="button"
-                        onClick={() => setSelectedChannel(channel.channelId)}
-                      >
-                        {channel.channelId}
-                      </button>
-                    </td>
-                    <td>{channel.cac.toFixed(2)}</td>
-                    <td>{channel.avgLtv.toFixed(2)}</td>
-                    <td>
-                      {Number.isFinite(channel.ratio) ? channel.ratio.toFixed(2) : '—'}
-                      {channel.ratio >= 3 && <span className="badge">Target</span>}
-                    </td>
-                    <td>{(channel.highLtvShare * 100).toFixed(1)}%</td>
-                  </tr>
-                ))}
+                {channelRatios.map((channel) => {
+                  const channelTone = Number.isFinite(channel.ratio) ? getRatioTone(channel.ratio) : null
+                  const channelClass = ['pill-button']
+                  if (selectedChannel === channel.channelId) channelClass.push('active')
+                  if (channelTone) channelClass.push(`tone-${channelTone}`)
+                  return (
+                    <tr key={channel.channelId}>
+                      <td>
+                        <button
+                          className={channelClass.join(' ')}
+                          type="button"
+                          onClick={() => setSelectedChannel(channel.channelId)}
+                        >
+                          {channel.channelId}
+                        </button>
+                      </td>
+                      <td>{channel.cac.toFixed(2)}</td>
+                      <td>{channel.avgLtv.toFixed(2)}</td>
+                      <td>
+                        {Number.isFinite(channel.ratio) ? channel.ratio.toFixed(2) : '—'}
+                        {channel.ratio >= 3 && <span className="badge">Target</span>}
+                      </td>
+                      <td>{(channel.highLtvShare * 100).toFixed(1)}%</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -414,4 +429,10 @@ export function SegmentDashboard() {
       </p>
     </div>
   )
+}
+
+function getRatioTone(ratio: number): 'positive' | 'warning' | 'negative' {
+  if (ratio >= 3) return 'positive'
+  if (ratio <= 1) return 'negative'
+  return 'warning'
 }

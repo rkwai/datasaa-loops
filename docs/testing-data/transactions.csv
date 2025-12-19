@@ -1,3 +1,7 @@
 transactionId,customerId,revenueAmount,date
-t1,cust_high,320,2024-01-03
-t2,cust_mid,80,2024-01-04
+t_green_1,cust_green_1,350,2024-01-05
+t_green_2,cust_green_2,320,2024-01-06
+t_yellow_1,cust_yellow_1,150,2024-01-07
+t_yellow_2,cust_yellow_2,160,2024-01-08
+t_red_1,cust_red_1,40,2024-01-09
+t_red_2,cust_red_2,25,2024-01-10

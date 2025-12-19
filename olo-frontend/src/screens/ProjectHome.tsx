@@ -109,32 +109,26 @@ export function ProjectHome() {
             <span className="pill" style={{ background: 'rgba(255,255,255,0.18)', color: '#fff' }}>
               CAC ↔ LTV loop lab
             </span>
-            <h2 style={{ margin: '1rem 0 0.5rem', fontSize: '2.35rem' }}>Improve your LTV↔CAC</h2>
-            <p style={{ margin: 0, maxWidth: 460, color: 'rgba(255,255,255,0.85)' }}>
-              Import customers, campaigns, and spend locally to spot the segments that earn the strongest payback, then act fast on the ratios.
+            <h2 style={{ margin: '1rem 0 0.75rem', fontSize: '2.6rem', lineHeight: 1.15 }}>
+              Keep LTV:CAC above 3:1
+            </h2>
+            <p style={{ margin: 0, color: 'rgba(255,255,255,0.9)', fontSize: '1.05rem' }}>
+              Every time a customer&apos;s lifetime value covers the cost of acquiring three more, growth compounds.<br/>This workspace
+              keeps that ratio visible so you can double down on the segments and channels that fuel the loop.
             </p>
-            <button type="button" data-testid="open-project-modal" onClick={() => setShowCreateModal(true)}>
-              Create new project
-            </button>
-          </div>
-          <div className="home-import-card">
-            <div className="home-icon-circle" aria-hidden="true">
-              ⬆︎
+            <div className="home-hero-buttons">
+              <button type="button" data-testid="open-project-modal" onClick={() => setShowCreateModal(true)}>
+                Create new project
+              </button>
+              <button
+                type="button"
+                className="secondary accent-ghost"
+                onClick={() => setShowImportModal(true)}
+                disabled={submitting}
+              >
+                Import project
+              </button>
             </div>
-            <div>
-              <h3 style={{ margin: '0 0 0.35rem' }}>Import bundle</h3>
-              <p className="page-description" style={{ margin: 0 }}>
-                Drop an OLO export (.zip) here to revive a previously tuned CAC↔LTV model, complete with IndexedDB data and configuration.
-              </p>
-            </div>
-            <button
-              type="button"
-              className="secondary"
-              onClick={() => setShowImportModal(true)}
-              disabled={submitting}
-            >
-              Import project
-            </button>
           </div>
         </section>
 

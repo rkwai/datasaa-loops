@@ -45,6 +45,9 @@ describe('core flows', () => {
     expect(warnings.pop()).toContain('missing customer ID')
   })
 
+  // KPI "Data readiness" / "Insight visibility" — Given source files exist locally,
+  // when a workspace ingests canonical datasets, then CAC & LTV metrics are recomputed
+  // without external services. (See testing-spec.md)
   it('computes LTV, segments, and channel CAC for channel_field attribution (Flows 3/4/6)', async () => {
     const projectId = await createProject('Compute', 'USD', 'UTC')
     createdProjects.push(projectId)
@@ -80,6 +83,8 @@ describe('core flows', () => {
     expect(segments.map((s) => s.segmentKey)).toContain('HIGH')
   })
 
+  // KPI "Insight visibility" — Given recomputed metrics, when stakeholders review attribution,
+  // then high-value cohorts and channels are obvious. (See testing-spec.md)
   it('respects acquired_via attribution (Flow 5)', async () => {
     const projectId = await createProject('Edges', 'USD', 'UTC')
     createdProjects.push(projectId)
@@ -107,6 +112,8 @@ describe('core flows', () => {
     expect(partner?.cac).toBeCloseTo(45)
   })
 
+  // KPI "Governance & auditability" — Given configuration or plan changes,
+  // when settings are saved or plans exported, then the audit log reflects who/what/when.
   it('exports and reimports a project bundle (Flow 8)', async () => {
     const projectId = await createProject('Export', 'USD', 'UTC')
     createdProjects.push(projectId)
@@ -120,6 +127,8 @@ describe('core flows', () => {
     expect(customers).toHaveLength(1)
   })
 
+  // KPI "Actionable reallocations" — Given insights, when a spend plan is generated,
+  // then proposed budgets keep the blended LTV:CAC above target. (See testing-spec.md)
   it('generates plan recommendations with positive/negative deltas (Flow 7)', () => {
     const items = generateRecommendations([
       { channelId: 'hero', cac: 50, highLtvShare: 0.8, spend: 1000 },
@@ -133,6 +142,8 @@ describe('core flows', () => {
     expect(waste && waste.delta).toBeLessThan(0)
   })
 
+  // KPI "Governance & auditability" — Given configuration or plan changes,
+  // when settings or tabs trigger updates, then the log reflects who/what/when. (See testing-spec.md)
   it('touches projects to support multi-tab awareness (Flow 10)', async () => {
     const projectId = await createProject('Touch', 'USD', 'UTC')
     createdProjects.push(projectId)

@@ -120,7 +120,7 @@ export function SettingsScreen() {
         <header className="settings-hero">
           <div>
             <h1>App settings</h1>
-            <p>Fine-tune definitions per project. Changes stay local to this browser profile.</p>
+            <p>Calibrate how LTV, churn, CAC, and segments are defined for this workspace. Every tweak stays local until you export.</p>
           </div>
           <div className="settings-hero-actions">
             {message && <span className="pill">{message}</span>}

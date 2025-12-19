@@ -59,7 +59,8 @@ export function AuditLogScreen() {
             <span>System audit log</span>
           </nav>
           <h1>Audit log</h1>
-          <p>Track imports, approvals, and system actions that happen inside this local workspace.</p>
+          <p>Every import, plan approval, and configuration change leaves a local breadcrumb,
+            so you can prove how CAC↔LTV decisions were made.</p>
         </div>
         <button type="button" onClick={handleExport}>
           <span className="material-symbols-outlined">download</span>

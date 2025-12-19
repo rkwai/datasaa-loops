@@ -174,8 +174,8 @@ export function ImportWizardScreen() {
           <div>
             <h1 data-testid="import-hero-title">Let’s get your data in.</h1>
             <p>
-              Upload your customers, transactions, channels, and spend so the compute engine can keep your LTV:CAC ratio
-              honest. Every import reruns the pipeline automatically.
+              Step 1 of the CAC↔LTV loop: upload customers, transactions, channels, and spend so the compute engine can
+              refresh ratios without leaving the browser. Every import reruns the pipeline automatically.
             </p>
             {status && !showMappingModal && (
               <span className="pill" data-testid="import-status">

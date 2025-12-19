@@ -45,8 +45,7 @@ export function ExportScreen() {
         <div>
           <h1>Export & backups</h1>
           <p className="page-description">
-            Build encrypted-ready ZIP bundles or pull materialized metrics for reporting. Nothing ever leaves
-            the browser unless you download it.
+            Package this CAC↔LTV lab as a ZIP or export individual metric tables for reporting. Nothing leaves the browser unless you download it.
           </p>
         </div>
         {message && <span className="pill">{message}</span>}

@@ -132,8 +132,8 @@ export function SegmentDashboard() {
           <div className="dashboard-chip">Analytics</div>
           <h1>Segment overview</h1>
           <p>
-            Visualize how each operational loop contributes to CAC payback and pinpoint the channels that
-            reliably produce high-value customers.
+            Visualize how each operational loop contributes to CAC payback. When you see which channels mint high-LTV segments,
+            you know exactly where the blended ratio is healthy — and where it needs help.
           </p>
         </div>
         <div className="dashboard-hero-actions">

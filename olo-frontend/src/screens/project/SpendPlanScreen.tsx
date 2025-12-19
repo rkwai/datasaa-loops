@@ -147,7 +147,7 @@ export function SpendPlanScreen() {
         <div className="spend-hero-header">
           <div>
             <h1>Spend reallocation</h1>
-            <p>Optimize your operational loops by reallocating budget to high-performing channels.</p>
+            <p>Keep the blended LTV:CAC ratio above target by shifting spend toward the loops that consistently pay back.</p>
           </div>
     {message && (
       <span className="pill" data-testid="plan-status">

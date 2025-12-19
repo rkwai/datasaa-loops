@@ -160,11 +160,15 @@ async function completeDataIntake(page: Page) {
 }
 
 test('user flows: data intake, ratio views, spend plan, governance, exports', async ({ page }) => {
+  // KPI "Data readiness" — Given source files exist locally, when a workspace ingests canonical datasets,
+  // then CAC & LTV metrics are recomputed without external services. (See testing-spec.md)
   await resetStorage(page)
   await createProject(page)
   await completeDataIntake(page)
 
   // Ratio dashboard
+  // KPI "Insight visibility" — Given recomputed metrics, when stakeholders review dashboards,
+  // then high-value cohorts and originating channels are obvious. (See testing-spec.md)
   await page.getByTestId('nav-dashboard').click()
   await expect(page.getByTestId('kpi-ltv-cac')).toBeVisible()
   await expect(page.locator('table').nth(1).getByText('Target').first()).toBeVisible()
@@ -178,6 +182,8 @@ test('user flows: data intake, ratio views, spend plan, governance, exports', as
   await expect(page.getByTestId('edge-detail-panel')).toBeVisible()
 
   // Spend plan flow
+  // KPI "Actionable reallocations" — Given insights, when a spend plan is generated/edited/approved,
+  // then proposed budgets keep the blended LTV:CAC above target. (See testing-spec.md)
   await page.getByTestId('nav-plan').click()
   const firstInput = page.getByTestId('spend-input-paid')
   await firstInput.fill('1500')
@@ -185,6 +191,8 @@ test('user flows: data intake, ratio views, spend plan, governance, exports', as
   await expect(page.getByTestId('plan-status')).toBeVisible()
 
   // Settings and audit log
+  // KPI "Governance & auditability" — Given configuration or plan changes,
+  // when settings are saved or plans exported, then the local audit log reflects who/what/when. (See testing-spec.md)
   await page.getByTestId('nav-settings').click()
   await page.getByTestId('settings-ltv-window').fill('60')
   await page.getByTestId('save-settings').click()

@@ -14,8 +14,8 @@
   --accent-dark: #00b075;
   --text-muted: #5b6478;
   --border: #e2e8f0;
-  --radius-md: 16px;
-  --radius-lg: 32px;
+  --radius-md: 5px;
+  --radius-lg: 10px;
 }
 
 *,
@@ -62,13 +62,13 @@ textarea {
 
 button {
   border: none;
-  border-radius: 999px;
+  border-radius: 10px;
   padding: 0.55rem 1.25rem;
   cursor: pointer;
   font-weight: 600;
   color: #fff;
   background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  box-shadow: 0 12px 20px rgba(0, 214, 143, 0.25);
+  box-shadow: 0 2.4px 4px rgba(0, 214, 143, 0.25);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -96,7 +96,7 @@ input,
 select,
 textarea {
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 5px;
   padding: 0.65rem 0.85rem;
   width: 100%;
   background: #fff;
@@ -108,7 +108,7 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: rgba(0, 214, 143, 0.6);
-  box-shadow: 0 0 0 4px rgba(0, 214, 143, 0.08);
+  box-shadow: 0 0 0 0.8px rgba(0, 214, 143, 0.08);
 }
 
 .layout {
@@ -142,7 +142,7 @@ textarea:focus {
 
 .nav-link {
   padding: 0.65rem 0.85rem;
-  border-radius: 12px;
+  border-radius: 5px;
   color: inherit;
   transition: background 0.2s ease, color 0.2s ease;
   font-weight: 500;
@@ -151,7 +151,7 @@ textarea:focus {
 .nav-link.active {
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 0.2px rgba(255, 255, 255, 0.08);
 }
 
 .content {
@@ -185,7 +185,7 @@ textarea:focus {
   align-items: center;
   gap: 0.35rem;
   padding: 0.2rem 0.85rem;
-  border-radius: 999px;
+  border-radius: 10px;
   font-size: 0.8rem;
   background: rgba(15, 23, 42, 0.08);
   color: #0f172a;
@@ -195,7 +195,7 @@ textarea:focus {
   background: var(--surface);
   border-radius: var(--radius-md);
   padding: 1.5rem;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
   border: 1px solid rgba(15, 23, 42, 0.05);
 }
 
@@ -204,7 +204,7 @@ textarea:focus {
   background: linear-gradient(135deg, #10172b, #1f2c47);
   color: #fff;
   padding: 2rem 2.5rem;
-  box-shadow: 0 40px 80px rgba(15, 23, 42, 0.45);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.45);
   margin-bottom: 2rem;
 }
 
@@ -223,7 +223,7 @@ textarea:focus {
 }
 
 .dashboard-hero-panel {
-  border-radius: 28px;
+  border-radius: 10px;
   padding: clamp(1.75rem, 2.5vw, 2.75rem);
   background: linear-gradient(135deg, #0f172a, #1d2c4f);
   color: #fff;
@@ -231,7 +231,7 @@ textarea:focus {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 1.5rem;
-  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.35);
 }
 
 .dashboard-hero-panel h1 {
@@ -246,7 +246,7 @@ textarea:focus {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 0.35rem 0.75rem;
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.8);
 }
@@ -275,12 +275,12 @@ textarea:focus {
   align-items: center;
   gap: 0.4rem;
   padding: 0.45rem 1rem;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid rgba(15, 23, 42, 0.12);
   background: #fff;
   color: #0f172a;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 0.8px 2.4px rgba(15, 23, 42, 0.08);
 }
 
 .dashboard-filter span {
@@ -310,11 +310,11 @@ textarea:focus {
 }
 
 .dashboard-kpi-card {
-  border-radius: 20px;
+  border-radius: 5px;
   padding: 1.35rem;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 3px 7px rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -322,12 +322,12 @@ textarea:focus {
 
 .tone-positive {
   border-color: rgba(34, 197, 94, 0.3);
-  box-shadow: 0 15px 40px rgba(34, 197, 94, 0.15);
+  box-shadow: 0 3px 8px rgba(34, 197, 94, 0.15);
 }
 
 .tone-negative {
   border-color: rgba(248, 113, 113, 0.3);
-  box-shadow: 0 15px 40px rgba(248, 113, 113, 0.12);
+  box-shadow: 0 3px 8px rgba(248, 113, 113, 0.12);
 }
 
 .tone-neutral {
@@ -337,7 +337,7 @@ textarea:focus {
 .kpi-icon {
   width: 38px;
   height: 38px;
-  border-radius: 12px;
+  border-radius: 5px;
   background: rgba(15, 23, 42, 0.05);
   display: flex;
   align-items: center;
@@ -369,10 +369,10 @@ textarea:focus {
 }
 
 .dashboard-panel {
-  border-radius: 28px;
+  border-radius: 10px;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -425,7 +425,7 @@ textarea:focus {
 }
 
 .pill-button {
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid rgba(15, 23, 42, 0.2);
   background: transparent;
   color: #0f172a;
@@ -487,17 +487,22 @@ textarea:focus {
   background: transparent;
   padding: 0;
   cursor: pointer;
+  box-shadow: none;
+}
+
+.home-brand:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 3px;
 }
 
 .home-logo {
   width: 42px;
   height: 42px;
   background-color: #fff;
-  border-radius: 0.95rem;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
   overflow: hidden;
 }
 
@@ -511,14 +516,14 @@ textarea:focus {
 .home-icon-circle {
   width: 64px;
   height: 64px;
-  border-radius: 1.5rem;
+  border-radius: 10px;
   background: rgba(15, 23, 42, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
   color: #0f172a;
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+  box-shadow: inset 0 0 0 0.2px rgba(15, 23, 42, 0.08);
 }
 
 .home-brand h1 {
@@ -537,7 +542,7 @@ textarea:focus {
 }
 
 .home-search input {
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
   border: none;
@@ -550,7 +555,7 @@ textarea:focus {
 }
 
 .home-search input:focus {
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 0 0.4px rgba(255, 255, 255, 0.35);
 }
 
 .home-search-wrap {
@@ -575,7 +580,7 @@ textarea:focus {
 .home-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
@@ -600,7 +605,7 @@ textarea:focus {
 }
 
 .home-hero-panel {
-  border-radius: 24px;
+  border-radius: 10px;
   padding: clamp(1.75rem, 2.5vw, 2.5rem);
   background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.15), transparent 50%),
     linear-gradient(135deg, #0f172a, #1d2c4f);
@@ -608,7 +613,7 @@ textarea:focus {
   min-height: 280px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.35);
 }
 
 .home-hero-panel::after {
@@ -629,7 +634,7 @@ textarea:focus {
 }
 
 .home-import-card {
-  border-radius: 24px;
+  border-radius: 10px;
   padding: 1.75rem;
   border: 2px dashed rgba(15, 23, 42, 0.12);
   background: rgba(255, 255, 255, 0.8);
@@ -658,9 +663,9 @@ textarea:focus {
 }
 
 .home-form-card {
-  border-radius: 24px;
+  border-radius: 10px;
   background: #fff;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
   padding: 1.75rem;
   border: 1px solid rgba(15, 23, 42, 0.05);
 }
@@ -668,7 +673,7 @@ textarea:focus {
 .home-error {
   margin-top: 1rem;
   padding: 0.85rem 1rem;
-  border-radius: 12px;
+  border-radius: 5px;
   background: rgba(244, 63, 94, 0.12);
   color: #b91c1c;
   border: 1px solid rgba(244, 63, 94, 0.25);
@@ -696,8 +701,8 @@ textarea:focus {
 
 .home-project-card {
   background: #fff;
-  border-radius: 24px;
-  box-shadow: 0 25px 50px rgba(15, 23, 42, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(15, 23, 42, 0.08);
   border: 1px solid rgba(15, 23, 42, 0.06);
   display: flex;
   flex-direction: column;
@@ -716,7 +721,7 @@ textarea:focus {
   bottom: 1rem;
   left: 1.25rem;
   padding: 0.35rem 0.85rem;
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.85);
   font-size: 0.8rem;
   color: #0f172a;
@@ -762,9 +767,9 @@ textarea:focus {
 .home-modal {
   width: min(520px, 100%);
   background: #fff;
-  border-radius: 28px;
+  border-radius: 10px;
   padding: 2rem;
-  box-shadow: 0 40px 80px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.35);
   border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
@@ -794,10 +799,10 @@ textarea:focus {
 
 .stat-card {
   background: #fff;
-  border-radius: 18px;
+  border-radius: 5px;
   padding: 1rem 1.25rem;
   border: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 3.6px 7.2px rgba(15, 23, 42, 0.08);
 }
 
 .stat-card h3 {
@@ -856,7 +861,7 @@ textarea:focus {
   align-items: center;
   gap: 0.25rem;
   padding: 0.2rem 0.8rem;
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(0, 214, 143, 0.15);
   color: #0f172a;
   font-weight: 600;
@@ -874,7 +879,7 @@ textarea:focus {
 
 .banner {
   padding: 0.9rem 1.1rem;
-  border-radius: 14px;
+  border-radius: 5px;
   font-size: 0.95rem;
   border: 1px solid transparent;
 }
@@ -904,7 +909,7 @@ textarea:focus {
 
 .chip {
   padding: 0.35rem 0.85rem;
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(15, 23, 42, 0.05);
   font-size: 0.85rem;
 }
@@ -912,17 +917,17 @@ textarea:focus {
 .dimming-card {
   background: radial-gradient(circle at top right, rgba(0, 214, 143, 0.08), transparent 60%),
     #fff;
-  border-radius: 24px;
+  border-radius: 10px;
   padding: 1.75rem;
   border: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
 }
 
 .table-card {
-  border-radius: 20px;
+  border-radius: 5px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   overflow: hidden;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
 }
 
 .table-card table {
@@ -949,8 +954,8 @@ textarea:focus {
     #0f172a;
   color: #fff;
   padding: 1.5rem;
-  border-radius: 26px;
-  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.45);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.45);
 }
 
 .wizard-sidebar h3 {
@@ -973,7 +978,7 @@ textarea:focus {
 .timeline-step span {
   width: 32px;
   height: 32px;
-  border-radius: 12px;
+  border-radius: 5px;
   background: rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
@@ -982,11 +987,11 @@ textarea:focus {
 }
 
 .wizard-panel {
-  border-radius: 26px;
+  border-radius: 10px;
   background: #fff;
   padding: 2rem;
   border: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
 }
 
 .history-list {
@@ -997,7 +1002,7 @@ textarea:focus {
 
 .log-entry {
   padding: 1rem 1.25rem;
-  border-radius: 14px;
+  border-radius: 5px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: #fff;
   display: flex;
@@ -1007,7 +1012,7 @@ textarea:focus {
 
 .tag {
   padding: 0.2rem 0.65rem;
-  border-radius: 999px;
+  border-radius: 10px;
   font-size: 0.78rem;
   background: rgba(0, 214, 143, 0.17);
   color: #0a553c;
@@ -1026,9 +1031,9 @@ textarea:focus {
   background: #0f172a;
   color: #fff;
   padding: 1rem 1.5rem;
-  border-radius: 20px;
+  border-radius: 5px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.3);
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.3);
 }
 
 .import-step {
@@ -1042,7 +1047,7 @@ textarea:focus {
 .import-step span {
   width: 36px;
   height: 36px;
-  border-radius: 12px;
+  border-radius: 5px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   display: inline-flex;
   align-items: center;
@@ -1072,10 +1077,10 @@ textarea:focus {
 }
 
 .import-hero {
-  border-radius: 32px;
+  border-radius: 10px;
   padding: clamp(2rem, 3vw, 3rem);
   background: #fff;
-  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.12);
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -1088,7 +1093,7 @@ textarea:focus {
 
 .import-drop-zone {
   border: 2px dashed rgba(15, 23, 42, 0.1);
-  border-radius: 28px;
+  border-radius: 10px;
   padding: 2.5rem;
   display: flex;
   flex-wrap: wrap;
@@ -1108,7 +1113,7 @@ textarea:focus {
 .import-drop-icon {
   width: 80px;
   height: 80px;
-  border-radius: 24px;
+  border-radius: 10px;
   background: rgba(0, 214, 143, 0.15);
   color: var(--accent);
   display: flex;
@@ -1128,7 +1133,7 @@ textarea:focus {
 
 .accent-button {
   border: none;
-  border-radius: 999px;
+  border-radius: 10px;
   padding: 0.65rem 1.5rem;
   background: var(--accent);
   color: #0f172a;
@@ -1136,7 +1141,7 @@ textarea:focus {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  box-shadow: 0 10px 25px rgba(0, 214, 143, 0.25);
+  box-shadow: 0 2px 5px rgba(0, 214, 143, 0.25);
 }
 
 .import-cards-row {
@@ -1154,7 +1159,7 @@ textarea:focus {
 }
 
 .import-status-card {
-  border-radius: 18px;
+  border-radius: 5px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   padding: 1rem;
   background: #fff;
@@ -1162,13 +1167,13 @@ textarea:focus {
   flex-direction: column;
   gap: 0.75rem;
   justify-content: space-between;
-  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 3px 7px rgba(15, 23, 42, 0.08);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .import-status-card.highlighted {
   border-color: rgba(5, 150, 105, 0.6);
-  box-shadow: 0 20px 45px rgba(5, 150, 105, 0.35);
+  box-shadow: 0 4px 9px rgba(5, 150, 105, 0.35);
 }
 
 .status-label {
@@ -1195,7 +1200,7 @@ textarea:focus {
 }
 
 .import-card {
-  border-radius: 20px;
+  border-radius: 5px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   padding: 1.5rem;
   background: #fff;
@@ -1236,11 +1241,11 @@ textarea:focus {
 }
 
 .import-panel {
-  border-radius: 24px;
+  border-radius: 10px;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.05);
   padding: 1.5rem;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
 }
 
 .import-mapping-grid {
@@ -1277,10 +1282,10 @@ textarea:focus {
   width: min(760px, 100%);
   max-height: 90vh;
   overflow-y: auto;
-  border-radius: 28px;
+  border-radius: 10px;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 35px 70px rgba(15, 23, 42, 0.4);
+  box-shadow: 0 7px 14px rgba(15, 23, 42, 0.4);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -1302,7 +1307,7 @@ textarea:focus {
 }
 
 .attribution-hero {
-  border-radius: 30px;
+  border-radius: 10px;
   padding: clamp(2rem, 3vw, 3rem);
   background: linear-gradient(135deg, #102a43, #1f3a55);
   color: #fff;
@@ -1336,11 +1341,11 @@ textarea:focus {
 }
 
 .attribution-config {
-  border-radius: 26px;
+  border-radius: 10px;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.05);
   padding: 1.5rem;
-  box-shadow: 0 25px 50px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 10px rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -1357,12 +1362,12 @@ textarea:focus {
   gap: 0.35rem;
   background: rgba(15, 23, 42, 0.03);
   padding: 0.35rem;
-  border-radius: 999px;
+  border-radius: 10px;
 }
 
 .pill-toggle button {
   flex: 1;
-  border-radius: 999px;
+  border-radius: 10px;
   background: transparent;
   box-shadow: none;
   padding: 0.45rem 0.75rem;
@@ -1371,7 +1376,7 @@ textarea:focus {
 
 .pill-toggle button.active {
   background: #fff;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.1);
   color: #0f172a;
 }
 
@@ -1386,21 +1391,21 @@ textarea:focus {
 .legend-dot {
   width: 12px;
   height: 12px;
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(15, 23, 42, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.1);
+  box-shadow: inset 0 0 0 0.2px rgba(15, 23, 42, 0.1);
 }
 
 .legend-dot.high {
   background: var(--accent);
-  box-shadow: 0 0 10px rgba(0, 214, 143, 0.4);
+  box-shadow: 0 0 2px rgba(0, 214, 143, 0.4);
 }
 
 .attribution-graph-panel {
-  border-radius: 30px;
+  border-radius: 10px;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.1);
   display: flex;
   flex-direction: column;
 }
@@ -1417,7 +1422,7 @@ textarea:focus {
 }
 
 .graph-controls button {
-  border-radius: 10px;
+  border-radius: 5px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: rgba(15, 23, 42, 0.02);
   padding: 0.35rem;
@@ -1470,14 +1475,14 @@ textarea:focus {
   position: absolute;
   transform: translateY(-50%);
   pointer-events: auto;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: rgba(255, 255, 255, 0.95);
   padding: 0.45rem 0.75rem;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.15);
 }
 
 .segment-node {
@@ -1492,10 +1497,10 @@ textarea:focus {
   background: rgba(16, 42, 67, 0.95);
   color: #fff;
   padding: 1.25rem;
-  border-radius: 18px;
+  border-radius: 5px;
   min-width: 220px;
   z-index: 10;
-  box-shadow: 0 35px 60px rgba(15, 23, 42, 0.4);
+  box-shadow: 0 7px 12px rgba(15, 23, 42, 0.4);
 }
 
 .edge-detail-card header {
@@ -1533,7 +1538,7 @@ textarea:focus {
 .edge-detail-card .progress {
   width: 100%;
   height: 5px;
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.2);
   margin-top: 0.35rem;
   overflow: hidden;
@@ -1542,7 +1547,7 @@ textarea:focus {
 .edge-detail-card .progress div {
   height: 100%;
   background: var(--accent);
-  box-shadow: 0 0 10px rgba(0, 214, 143, 0.5);
+  box-shadow: 0 0 2px rgba(0, 214, 143, 0.5);
 }
 
 @media (max-width: 960px) {
@@ -1564,9 +1569,9 @@ textarea:focus {
 
 .spend-hero {
   background: #fff;
-  border-radius: 32px;
+  border-radius: 10px;
   padding: clamp(2rem, 3vw, 3rem);
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -1603,7 +1608,7 @@ textarea:focus {
   gap: 0.5rem;
   background: rgba(15, 23, 42, 0.03);
   padding: 0.4rem;
-  border-radius: 999px;
+  border-radius: 10px;
 }
 
 .objective-toggle label {
@@ -1620,7 +1625,7 @@ textarea:focus {
 .objective-toggle span {
   display: block;
   padding: 0.6rem 1.2rem;
-  border-radius: 999px;
+  border-radius: 10px;
   text-align: center;
   font-weight: 600;
   color: var(--text-muted);
@@ -1628,7 +1633,7 @@ textarea:focus {
 
 .objective-toggle input:checked + span {
   background: #fff;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.1);
   color: #0f172a;
 }
 
@@ -1639,11 +1644,11 @@ textarea:focus {
 }
 
 .spend-summary-card {
-  border-radius: 22px;
+  border-radius: 10px;
   padding: 1.5rem;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
 }
 
 .spend-summary-card p {
@@ -1665,7 +1670,7 @@ textarea:focus {
 .icon-circle {
   width: 42px;
   height: 42px;
-  border-radius: 14px;
+  border-radius: 5px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1684,11 +1689,11 @@ textarea:focus {
 }
 
 .spend-table-panel {
-  border-radius: 32px;
+  border-radius: 10px;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.06);
   padding: 1.5rem;
-  box-shadow: 0 30px 70px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -1735,7 +1740,7 @@ textarea:focus {
   align-items: center;
   gap: 0.35rem;
   padding: 0.25rem 0.75rem;
-  border-radius: 999px;
+  border-radius: 10px;
   font-weight: 600;
 }
 
@@ -1763,7 +1768,7 @@ textarea:focus {
 
 .input-wrapper input {
   width: 100%;
-  border-radius: 12px;
+  border-radius: 5px;
   border: 1px solid rgba(15, 23, 42, 0.12);
   padding: 0.55rem 0.75rem 0.55rem 1.6rem;
   text-align: right;
@@ -1771,11 +1776,11 @@ textarea:focus {
 }
 
 .spend-history-panel {
-  border-radius: 28px;
+  border-radius: 10px;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.05);
   padding: 1.5rem;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
 }
 
 .spend-history-panel h3 {
@@ -1786,7 +1791,7 @@ textarea:focus {
   position: sticky;
   bottom: 0;
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(6px);
   border-top: 1px solid rgba(15, 23, 42, 0.08);
   padding: 1rem 1.5rem;
   margin-top: 1rem;
@@ -1794,7 +1799,7 @@ textarea:focus {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 1rem;
-  box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 -1px 3.6px rgba(15, 23, 42, 0.05);
 }
 
 .spend-footer-metrics {
@@ -1843,7 +1848,7 @@ textarea:focus {
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.75rem;
-  border-radius: 14px;
+  border-radius: 5px;
   border-left: 4px solid transparent;
   background: rgba(15, 23, 42, 0.02);
   color: var(--text-muted);
@@ -1854,7 +1859,7 @@ textarea:focus {
   border-left-color: var(--accent);
   background: #fff;
   color: #0f172a;
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
 }
 
 .settings-nav span.material-symbols-outlined {
@@ -1869,7 +1874,7 @@ textarea:focus {
 }
 
 .settings-hero {
-  border-radius: 28px;
+  border-radius: 10px;
   background: linear-gradient(120deg, #0f2841, #17405d);
   color: #fff;
   padding: clamp(1.75rem, 3vw, 2.5rem);
@@ -1900,7 +1905,7 @@ textarea:focus {
 .settings-hero-actions button {
   background: #fff;
   color: #0f172a;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2.4px 4.8px rgba(0, 0, 0, 0.15);
 }
 
 .settings-section h2 {
@@ -1908,11 +1913,11 @@ textarea:focus {
 }
 
 .settings-card {
-  border-radius: 24px;
+  border-radius: 10px;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.06);
   padding: 1.5rem;
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -1938,7 +1943,7 @@ textarea:focus {
 
 .settings-card input,
 .settings-card select {
-  border-radius: 12px;
+  border-radius: 5px;
   border: 1px solid rgba(15, 23, 42, 0.12);
   padding: 0.6rem 0.8rem;
 }
@@ -1966,7 +1971,7 @@ textarea:focus {
 }
 
 .audit-hero {
-  border-radius: 28px;
+  border-radius: 10px;
   background: linear-gradient(120deg, #1e293b, #102a43);
   color: #fff;
   padding: clamp(1.5rem, 3vw, 2.25rem);
@@ -1997,7 +2002,7 @@ textarea:focus {
 .audit-hero button {
   background: var(--accent);
   color: #0f172a;
-  box-shadow: 0 15px 35px rgba(0, 214, 143, 0.25);
+  box-shadow: 0 3px 7px rgba(0, 214, 143, 0.25);
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -2018,7 +2023,7 @@ textarea:focus {
 
 .search-wrap input {
   width: 100%;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid rgba(15, 23, 42, 0.12);
   padding: 0.6rem 1rem 0.6rem 2.5rem;
 }
@@ -2039,7 +2044,7 @@ textarea:focus {
 
 .chip-row .chip {
   padding: 0.35rem 1rem;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid rgba(15, 23, 42, 0.1);
   background: #fff;
   color: var(--text-muted);
@@ -2050,14 +2055,14 @@ textarea:focus {
   background: var(--accent);
   border-color: transparent;
   color: #0f172a;
-  box-shadow: 0 10px 25px rgba(0, 214, 143, 0.25);
+  box-shadow: 0 2px 5px rgba(0, 214, 143, 0.25);
 }
 
 .audit-table {
-  border-radius: 24px;
+  border-radius: 10px;
   border: 1px solid rgba(15, 23, 42, 0.06);
   background: #fff;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
   overflow-x: auto;
 }
 

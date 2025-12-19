@@ -325,7 +325,14 @@ export function ImportWizardScreen() {
             </div>
 
             <section className="import-panel">
-              <label htmlFor="dataset-select">Dataset</label>
+              <div className="import-panel-heading">
+                <span className="material-symbols-outlined">dataset</span>
+                <div>
+                  <h3>Dataset</h3>
+                  <p className="page-description">{schema.description}</p>
+                </div>
+              </div>
+              <label htmlFor="dataset-select">Select dataset</label>
               <select
                 id="dataset-select"
                 data-testid="dataset-select"
@@ -345,11 +352,16 @@ export function ImportWizardScreen() {
                   </option>
                 ))}
               </select>
-              <p className="page-description">{schema.description}</p>
             </section>
 
             <section className="import-panel">
-              <h3>Column mapping</h3>
+              <div className="import-panel-heading">
+                <span className="material-symbols-outlined">grid_on</span>
+                <div>
+                  <h3>Column mapping</h3>
+                  <p className="page-description">Match each schema field to a column in your CSV.</p>
+                </div>
+              </div>
               <div className="import-mapping-grid">
                 {schema.fields.map((field) => (
                   <div key={field.key}>
@@ -379,7 +391,13 @@ export function ImportWizardScreen() {
 
             {previewColumns.length > 0 && (
               <section className="import-panel">
-                <h3>Preview (first {previewColumns.length} rows)</h3>
+                <div className="import-panel-heading">
+                  <span className="material-symbols-outlined">visibility</span>
+                  <div>
+                    <h3>Preview</h3>
+                    <p className="page-description">First {previewColumns.length} rows shown for validation.</p>
+                  </div>
+                </div>
                 <div className="dashboard-table" style={{ marginTop: '0.75rem' }}>
                   <table>
                     <thead>

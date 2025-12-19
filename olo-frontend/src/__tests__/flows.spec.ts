@@ -131,10 +131,10 @@ describe('core flows', () => {
   // then proposed budgets keep the blended LTV:CAC above target. (See testing-spec.md)
   it('generates plan recommendations with positive/negative deltas (Flow 7)', () => {
     const items = generateRecommendations([
-      { channelId: 'hero', cac: 50, highLtvShare: 0.8, spend: 1000 },
-      { channelId: 'steady', cac: 120, highLtvShare: 0.6, spend: 800 },
-      { channelId: 'laggard', cac: 200, highLtvShare: 0.25, spend: 900 },
-      { channelId: 'waste', cac: 300, highLtvShare: 0.05, spend: 700 },
+      { channelId: 'hero', cac: 50, highLtvShare: 0.8, spend: 1000, avgLtv: 250, netValue: 200, acquiredCustomers: 40 },
+      { channelId: 'steady', cac: 120, highLtvShare: 0.6, spend: 800, avgLtv: 240, netValue: 120, acquiredCustomers: 30 },
+      { channelId: 'laggard', cac: 200, highLtvShare: 0.25, spend: 900, avgLtv: 160, netValue: -40, acquiredCustomers: 20 },
+      { channelId: 'waste', cac: 300, highLtvShare: 0.05, spend: 700, avgLtv: 90, netValue: -210, acquiredCustomers: 18 },
     ])
     const hero = items.find((item) => item.channelId === 'hero')
     const waste = items.find((item) => item.channelId === 'waste')

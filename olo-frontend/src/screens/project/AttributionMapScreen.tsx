@@ -9,6 +9,12 @@ const SEGMENT_COLORS: Record<SegmentKey, string> = {
   LOW: '#94a3b8',
 }
 
+const SEGMENT_LABELS: Record<SegmentKey, string> = {
+  HIGH: 'High LTV',
+  MID: 'Mid LTV',
+  LOW: 'Low LTV',
+}
+
 interface EdgeInfo {
   channelId: string
   segment: SegmentKey
@@ -19,10 +25,12 @@ interface EdgeInfo {
 export function AttributionMapScreen() {
   const { db } = useProjectContext()
   const liveChannelMetrics = useLiveQuery(() => db.channelMetrics.toArray(), [db])
+  const liveChannels = useLiveQuery(() => db.channels.toArray(), [db])
   const liveCustomers = useLiveQuery(() => db.customers.toArray(), [db])
   const liveCustomerMetrics = useLiveQuery(() => db.customerMetrics.toArray(), [db])
 
   const channelMetrics = useMemo(() => liveChannelMetrics ?? [], [liveChannelMetrics])
+  const channelRecords = useMemo(() => liveChannels ?? [], [liveChannels])
   const customers = useMemo(() => liveCustomers ?? [], [liveCustomers])
   const customerMetrics = useMemo(() => liveCustomerMetrics ?? [], [liveCustomerMetrics])
   const [selectedEdge, setSelectedEdge] = useState<EdgeInfo | null>(null)
@@ -62,6 +70,13 @@ export function AttributionMapScreen() {
   ) as string[]
   const channels = channelMetrics.length ? channelMetrics.map((metric) => metric.channelId) : fallbackChannels
   const segments: SegmentKey[] = ['HIGH', 'MID', 'LOW']
+  const channelNameMap = useMemo(() => {
+    const map = new Map<string, string>()
+    channelRecords.forEach((channel) => {
+      map.set(channel.channelId, channel.name?.trim() || channel.channelId)
+    })
+    return map
+  }, [channelRecords])
   const maxCount = edges.reduce((max, edge) => Math.max(max, edge.count), 0)
 
   const totalSpend = channelMetrics.reduce((sum, channel) => sum + channel.spend, 0)
@@ -70,18 +85,28 @@ export function AttributionMapScreen() {
   const totalRevenue = customerMetrics.reduce((sum, metric) => sum + metric.ltv, 0)
   const avgLtv = customerMetrics.length ? totalRevenue / customerMetrics.length : 0
 
-  const width = 900
-  const rowHeight = 80
-  const height = Math.max(channels.length, segments.length) * rowHeight + 120
+  const width = 960
+  const nodeColumnWidth = 260
+  const nodeHeight = 88
+  const rowSpacing = nodeHeight + 36
+  const graphPadding = 80
+  const rows = Math.max(channels.length, segments.length, 1)
+  const height = Math.max(rows * rowSpacing + graphPadding * 2, 520)
+  const columnInset = 40
+  const connectorOffset = 6
+  const leftColumnX = columnInset
+  const rightColumnX = width - columnInset - nodeColumnWidth
+  const leftAnchorX = leftColumnX + nodeColumnWidth + connectorOffset
+  const rightAnchorX = rightColumnX - connectorOffset
 
   const channelPositions = new Map<string, number>()
   channels.forEach((channelId, index) => {
-    channelPositions.set(channelId, 100 + index * rowHeight)
+    channelPositions.set(channelId, graphPadding + index * rowSpacing)
   })
 
   const segmentPositions = new Map<SegmentKey, number>()
   segments.forEach((segment, index) => {
-    segmentPositions.set(segment, 100 + index * rowHeight)
+    segmentPositions.set(segment, graphPadding + index * rowSpacing)
   })
 
   function handleEdgeSelect(edge: EdgeInfo) {
@@ -144,30 +169,23 @@ export function AttributionMapScreen() {
             Configuration
           </div>
           <div className="attribution-config-section">
-            <label>Attribution model</label>
-            <div className="pill-toggle">
-              <button type="button" className="active">
-                First touch
-              </button>
-              <button type="button">Last touch</button>
-              <button type="button">Linear</button>
-            </div>
-          </div>
-          <div className="attribution-config-section">
-            <label>Minimum volume</label>
-            <input type="range" min="0" max="1000" defaultValue="100" />
-            <span className="range-value">≥100 users</span>
+            <label>Attribution methodology</label>
+            <p>
+              We currently plot each connection using the first channel recorded for a customer. Multi-touch models
+              (last-touch, linear, etc.) and minimum-volume filters will show up here once we have the supporting data.
+            </p>
           </div>
           <div className="attribution-config-section">
             <label>Legend</label>
-            <div className="legend-row">
-              <span className="legend-dot high" />
-              <span>High LTV connection</span>
-            </div>
-            <div className="legend-row">
-              <span className="legend-dot standard" />
-              <span>Standard volume</span>
-            </div>
+            {segments.map((segment) => {
+              const variant = segment.toLowerCase()
+              return (
+                <div className="legend-row" key={segment}>
+                  <span className={`legend-dot ${variant}`} />
+                  <span>{SEGMENT_LABELS[segment]}</span>
+                </div>
+              )
+            })}
           </div>
         </aside>
 
@@ -190,7 +208,7 @@ export function AttributionMapScreen() {
             </div>
           </div>
 
-          <div className="attribution-graph">
+          <div className="attribution-graph" style={{ height }}>
             <svg width={width} height={height} role="presentation">
               <defs>
                 <linearGradient id="edge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -205,13 +223,14 @@ export function AttributionMapScreen() {
                 return (
                   <line
                     key={`${edge.channelId}-${edge.segment}`}
-                    x1={120}
+                    x1={leftAnchorX}
                     y1={y1}
-                    x2={width - 140}
+                    x2={rightAnchorX}
                     y2={y2}
                     stroke={SEGMENT_COLORS[edge.segment]}
                     strokeWidth={strokeWidth}
                     opacity={0.75}
+                    strokeLinecap="round"
                     className="flow-line"
                     data-testid={`edge-${edge.channelId}-${edge.segment}`}
                     onClick={() => handleEdgeSelect(edge)}
@@ -220,38 +239,43 @@ export function AttributionMapScreen() {
               })}
             </svg>
 
-            <div className="node-column left">
-              {channels.map((channelId) => (
-                <button
-                  key={channelId}
-                  type="button"
-                  className="channel-node"
-                  style={{ top: `${((channelPositions.get(channelId) ?? 0) / height) * 100}%` }}
-                >
-                  <span className="material-symbols-outlined">podcasts</span>
-                  <div>
-                    <strong>{channelId}</strong>
-                    <span>
-                      CAC $
-                      {channelMetrics
-                        .find((metric) => metric.channelId === channelId)
-                        ?.cac.toFixed(0) ?? '—'}
-                    </span>
-                  </div>
-                </button>
-              ))}
+            <div className="node-column left" style={{ left: leftColumnX, width: nodeColumnWidth }}>
+              {channels.map((channelId) => {
+                const label = channelNameMap.get(channelId) ?? channelId
+                const showId = label !== channelId
+                return (
+                  <button
+                    key={channelId}
+                    type="button"
+                    className="channel-node"
+                    style={{ top: channelPositions.get(channelId) ?? graphPadding, height: nodeHeight }}
+                  >
+                    <span className="material-symbols-outlined">podcasts</span>
+                    <div>
+                      <strong>{label}</strong>
+                      {showId && <small>{channelId}</small>}
+                      <span>
+                        CAC $
+                        {channelMetrics
+                          .find((metric) => metric.channelId === channelId)
+                          ?.cac.toFixed(0) ?? '—'}
+                      </span>
+                    </div>
+                  </button>
+                )
+              })}
             </div>
 
-            <div className="node-column right">
+            <div className="node-column right" style={{ left: rightColumnX, width: nodeColumnWidth }}>
               {segments.map((segment) => (
                 <div
                   key={segment}
                   className="segment-node"
-                  style={{ top: `${((segmentPositions.get(segment) ?? 0) / height) * 100}%` }}
+                  style={{ top: segmentPositions.get(segment) ?? graphPadding, height: nodeHeight }}
                 >
                   <span className="material-symbols-outlined">group_work</span>
                   <div>
-                    <strong>{segment}</strong>
+                    <strong>{SEGMENT_LABELS[segment]}</strong>
                     <span>
                       LTV $
                       {customerMetrics.length

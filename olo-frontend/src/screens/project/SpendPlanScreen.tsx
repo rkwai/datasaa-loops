@@ -2,13 +2,47 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { nanoid } from 'nanoid'
 import { useProjectContext } from '../../context/useProjectContext'
-import type { ActionPlanItem, ActionPlanRecord } from '../../db/types'
-import { generateRecommendations } from '../../utils/spendPlan'
+import type { ActionPlanItem, ActionPlanRecord, ChannelMetricsRecord } from '../../db/types'
+import { generateRecommendations, type AllocationStrategy } from '../../utils/spendPlan'
 
-const OBJECTIVE_PRESETS = [
-  'Increase HIGH segment efficiency',
-  'Maximize revenue',
-  'Target CPA stability',
+interface StrategyOption {
+  key: AllocationStrategy
+  label: string
+  description: string
+  bullets: string[]
+}
+
+const OBJECTIVE_OPTIONS: StrategyOption[] = [
+  {
+    key: 'high_efficiency',
+    label: 'Increase HIGH segment efficiency',
+    description:
+      'Use this when you need to raise the blended LTV:CAC quickly. We funnel extra dollars into the channels creating the highest share of HIGH-segment customers and stop rewarding under-performers.',
+    bullets: [
+      'Reroutes ~12% of spend toward the best HIGH-share, efficient CAC channels.',
+      'Cuts that budget from sources with <20% HIGH mix or LTV:CAC below 1.2x, so weak ratios are not funded.',
+    ],
+  },
+  {
+    key: 'maximize_revenue',
+    label: 'Maximize revenue',
+    description:
+      'Pick this when leadership cares most about topline growth. We overweight the channels that have the strongest positive net value even if their CAC is higher, while draining net-negative efforts.',
+    bullets: [
+      'Invests aggressively in channels with positive net value and large LTV contributions.',
+      'Reduces or freezes channels that are net-negative or below 1.4x LTV:CAC and explains when we must keep a baseline for coverage.',
+    ],
+  },
+  {
+    key: 'stability',
+    label: 'Target CPA stability',
+    description:
+      'Choose this when you want gentle adjustments that protect the blended CAC. We only move ~6% of budget, nudging dependable channels up and trimming risky outliers.',
+    bullets: [
+      'Boosts steady 2-3.5x LTV:CAC channels just enough to offset weaker ones.',
+      'Cuts sources that fall below 1.2x so inefficient spend is minimized while most channels remain unchanged.',
+    ],
+  },
 ]
 
 const scheduleStateUpdate = (fn: () => void) => {
@@ -24,18 +58,19 @@ export function SpendPlanScreen() {
   const liveChannelMetrics = useLiveQuery(() => db.channelMetrics.toArray(), [db])
   const channelMetrics = useMemo(() => liveChannelMetrics ?? [], [liveChannelMetrics])
   const plans = useLiveQuery(() => db.actionPlans.orderBy('createdAt').reverse().toArray(), [db]) ?? []
-  const [objective, setObjective] = useState(OBJECTIVE_PRESETS[0])
+  const [objective, setObjective] = useState<AllocationStrategy>(OBJECTIVE_OPTIONS[0].key)
   const [items, setItems] = useState<ActionPlanItem[]>([])
   const [approvedPlan, setApprovedPlan] = useState<ActionPlanRecord | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const selectedObjective = OBJECTIVE_OPTIONS.find((option) => option.key === objective) ?? OBJECTIVE_OPTIONS[0]
 
   useEffect(() => {
     if (!channelMetrics.length) {
       scheduleStateUpdate(() => setItems([]))
       return
     }
-    scheduleStateUpdate(() => setItems(generateRecommendations(channelMetrics)))
-  }, [channelMetrics])
+    scheduleStateUpdate(() => setItems(generateRecommendations(channelMetrics, objective)))
+  }, [channelMetrics, objective])
 
   const totalCurrentSpend = useMemo(
     () => items.reduce((sum, item) => sum + item.currentSpend, 0),
@@ -46,6 +81,11 @@ export function SpendPlanScreen() {
     [items],
   )
   const totalDelta = totalProposed - totalCurrentSpend
+
+  const channelMetricMap = useMemo(
+    () => new Map(channelMetrics.map((metric) => [metric.channelId, metric])),
+    [channelMetrics],
+  )
 
   const ratioByChannel = new Map(
     channelMetrics.map((metric) => {
@@ -61,12 +101,45 @@ export function SpendPlanScreen() {
     return sum + Math.max(item.delta, 0) * ratio
   }, 0)
 
+  const strategyImpact = useMemo(() => {
+    const increases = items.filter((item) => item.delta > 1)
+    const decreases = items.filter((item) => item.delta < -1)
+    const held = Math.max(items.length - increases.length - decreases.length, 0)
+    const addTotal = increases.reduce((sum, item) => sum + item.delta, 0)
+    const cutTotal = Math.abs(decreases.reduce((sum, item) => sum + item.delta, 0))
+    const averageFrom = (list: ActionPlanItem[], picker: (metric: ChannelMetricsRecord) => number) => {
+      const values = list
+        .map((item) => channelMetricMap.get(item.channelId))
+        .filter((metric): metric is ChannelMetricsRecord => Boolean(metric))
+        .map(picker)
+        .filter((value) => Number.isFinite(value))
+      if (!values.length) return null
+      return values.reduce((sum, value) => sum + value, 0) / values.length
+    }
+    return {
+      increases,
+      decreases,
+      held,
+      addTotal,
+      cutTotal,
+      avgHighShare: averageFrom(increases, (metric) => metric.highLtvShare),
+      avgIncreaseRatio: averageFrom(increases, (metric) => (metric.cac > 0 ? metric.avgLtv / metric.cac : 0)),
+      avgDecreaseRatio: averageFrom(decreases, (metric) => (metric.cac > 0 ? metric.avgLtv / metric.cac : 0)),
+    }
+  }, [items, channelMetricMap])
+
+  const formatPercent = (value: number | null) =>
+    value === null || !Number.isFinite(value) ? '—' : `${(value * 100).toFixed(0)}%`
+  const formatRatioText = (value: number | null) =>
+    value === null || !Number.isFinite(value) ? '—' : `${value.toFixed(1)}x`
+
   async function handleApprove() {
     if (!items.length) return
     const planId = `plan-${nanoid(6)}`
+    const planObjective = selectedObjective?.label ?? OBJECTIVE_OPTIONS[0].label
     const record: ActionPlanRecord = {
       planId,
-      objective,
+      objective: planObjective,
       modelVersion: 1,
       createdAt: new Date().toISOString(),
       approvedAt: new Date().toISOString(),
@@ -149,26 +222,61 @@ export function SpendPlanScreen() {
             <h1>Spend reallocation</h1>
             <p>Keep the blended LTV:CAC ratio above target by shifting spend toward the loops that consistently pay back.</p>
           </div>
-    {message && (
-      <span className="pill" data-testid="plan-status">
-        {message}
-      </span>
-    )}
+          {message && (
+            <span className="pill" data-testid="plan-status">
+              {message}
+            </span>
+          )}
         </div>
         <div className="objective-toggle">
-          {OBJECTIVE_PRESETS.map((option) => (
-            <label key={option}>
+          {OBJECTIVE_OPTIONS.map((option) => (
+            <label key={option.key}>
               <input
                 type="radio"
                 name="objective"
-                value={option}
-                checked={objective === option}
-                onChange={() => setObjective(option)}
+                value={option.key}
+                checked={objective === option.key}
+                onChange={() => setObjective(option.key)}
               />
-              <span>{option}</span>
+              <span>{option.label}</span>
             </label>
           ))}
         </div>
+        {selectedObjective && (
+          <div className="strategy-explainer">
+            <div className="strategy-explainer-text">
+              <h3>{selectedObjective.label}</h3>
+              <p>{selectedObjective.description}</p>
+            </div>
+            <ul>
+              {selectedObjective.bullets.map((bullet) => (
+                <li key={bullet}>{bullet}</li>
+              ))}
+            </ul>
+            <div className="strategy-stats">
+              <div>
+                <span>Reinvesting</span>
+                <strong>${Math.max(strategyImpact.addTotal, 0).toFixed(0)}</strong>
+                <small>
+                  {strategyImpact.increases.length} channels · avg {formatPercent(strategyImpact.avgHighShare)} HIGH /{' '}
+                  {formatRatioText(strategyImpact.avgIncreaseRatio)} LTV:CAC
+                </small>
+              </div>
+              <div>
+                <span>Cutting</span>
+                <strong>${Math.max(strategyImpact.cutTotal, 0).toFixed(0)}</strong>
+                <small>
+                  {strategyImpact.decreases.length} channels · avg {formatRatioText(strategyImpact.avgDecreaseRatio)} LTV:CAC
+                </small>
+              </div>
+              <div>
+                <span>Held steady</span>
+                <strong>{strategyImpact.held}</strong>
+                <small>channels unchanged</small>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="spend-summary-grid">
@@ -243,6 +351,7 @@ export function SpendPlanScreen() {
                         <div>
                           <strong>{item.channelId}</strong>
                           <span>Delta {item.delta >= 0 ? '+' : ''}${item.delta.toFixed(0)}</span>
+                          <small>{item.rationale}</small>
                         </div>
                       </div>
                     </td>
@@ -316,7 +425,7 @@ export function SpendPlanScreen() {
       <footer className="spend-footer">
         <div className="spend-footer-metrics">
           <div>
-            <span>Total reallocated</span>
+            <span>Total reallocated&nbsp;</span>
             <strong>
               ${totalProposed.toFixed(0)} <small>of ${totalCurrentSpend.toFixed(0)}</small>
             </strong>
@@ -324,7 +433,11 @@ export function SpendPlanScreen() {
           <div className={`badge ${budgetStatus === 'Within budget' ? 'positive' : 'negative'}`}>{budgetStatus}</div>
         </div>
         <div className="spend-footer-actions">
-          <button type="button" className="ghost" onClick={() => setItems(generateRecommendations(channelMetrics))}>
+          <button
+            type="button"
+            className="ghost"
+            onClick={() => setItems(generateRecommendations(channelMetrics, objective))}
+          >
             Discard
           </button>
           <button type="button" className="ghost" onClick={() => handleExport('csv')}>

@@ -88,34 +88,6 @@ export function SettingsScreen() {
 
   return (
     <div className="settings-shell">
-      <aside className="settings-nav">
-        <a href="#general" className="active">
-          <span className="material-symbols-outlined">tune</span>
-          General
-          <span className="material-symbols-outlined">chevron_right</span>
-        </a>
-        <a href="#ltv">
-          <span className="material-symbols-outlined">monetization_on</span>
-          LTV definition
-          <span className="material-symbols-outlined">chevron_right</span>
-        </a>
-        <a href="#cac">
-          <span className="material-symbols-outlined">attribution</span>
-          CAC & attribution
-          <span className="material-symbols-outlined">chevron_right</span>
-        </a>
-        <a href="#segmentation">
-          <span className="material-symbols-outlined">segment</span>
-          Segment rules
-          <span className="material-symbols-outlined">chevron_right</span>
-        </a>
-        <a href="#data">
-          <span className="material-symbols-outlined">database</span>
-          Data management
-          <span className="material-symbols-outlined">chevron_right</span>
-        </a>
-      </aside>
-
       <form className="settings-main" onSubmit={handleSave}>
         <header className="settings-hero">
           <div>
@@ -129,7 +101,10 @@ export function SettingsScreen() {
         </header>
 
         <section id="general" className="settings-section">
-          <h2>General preferences</h2>
+          <h2>
+            <span className="material-symbols-outlined">tune</span>
+            General preferences
+          </h2>
           <div className="settings-card grid">
             <label>
               <span>Currency</span>
@@ -143,7 +118,10 @@ export function SettingsScreen() {
         </section>
 
         <section id="ltv" className="settings-section">
-          <h2>LTV definition</h2>
+          <h2>
+            <span className="material-symbols-outlined">monetization_on</span>
+            LTV definition
+          </h2>
           <div className="settings-card">
             <label>
               <span>LTV window (days)</span>
@@ -163,7 +141,10 @@ export function SettingsScreen() {
         </section>
 
         <section id="cac" className="settings-section">
-          <h2>CAC & attribution</h2>
+          <h2>
+            <span className="material-symbols-outlined">attribution</span>
+            CAC & attribution
+          </h2>
           <div className="settings-card grid">
             <label>
               <span>CAC spend source</span>
@@ -188,7 +169,10 @@ export function SettingsScreen() {
         </section>
 
         <section id="segmentation" className="settings-section">
-          <h2>Segment rules</h2>
+          <h2>
+            <span className="material-symbols-outlined">segment</span>
+            Segment rules
+          </h2>
           <div className="settings-card grid">
             <label>
               <span>Segment high quantile</span>
@@ -202,7 +186,10 @@ export function SettingsScreen() {
         </section>
 
         <section id="data" className="settings-section">
-          <h2>Data management</h2>
+          <h2>
+            <span className="material-symbols-outlined">database</span>
+            Data management
+          </h2>
           <div className="settings-card data">
             <div>
               <p>Clear local data</p>

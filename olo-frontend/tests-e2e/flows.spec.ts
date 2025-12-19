@@ -96,15 +96,20 @@ async function uploadDataset(page: Page, dataset: string, csv: string) {
     mimeType: 'text/csv',
     buffer: Buffer.from(csv),
   })
-  const modal = page.locator('.import-modal')
+  const modal = page.getByTestId('import-modal')
   await expect(modal).toBeVisible({ timeout: 15000 })
   const datasetSelect = page.getByTestId('dataset-select')
   await datasetSelect.selectOption(dataset)
-  await page.getByTestId('import-submit').click()
-  await expect(page.getByTestId('import-status')).toBeVisible({
+  const submitButton = page.getByTestId('import-submit')
+  await expect(submitButton).toBeEnabled({ timeout: 20000 })
+  const statusPill = page.getByTestId('import-status')
+  await submitButton.click()
+  await expect(statusPill).toBeVisible({
     timeout: 20000,
   })
-  await page.getByTestId('import-modal-close').click()
+  await expect(statusPill).toHaveText(/All data processed!/, {
+    timeout: 20000,
+  })
 }
 
 async function resetStorage(page: Page) {

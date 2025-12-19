@@ -109,10 +109,9 @@ export function ProjectHome() {
             <span className="pill" style={{ background: 'rgba(255,255,255,0.18)', color: '#fff' }}>
               CAC ↔ LTV loop lab
             </span>
-            <h2 style={{ margin: '1rem 0 0.5rem', fontSize: '2.35rem' }}>Start a new loop analysis</h2>
+            <h2 style={{ margin: '1rem 0 0.5rem', fontSize: '2.35rem' }}>Improve your LTV↔CAC</h2>
             <p style={{ margin: 0, maxWidth: 460, color: 'rgba(255,255,255,0.85)' }}>
-              Spin up an isolated workspace to import customers, campaigns, and spend streams. Everything stays
-              on-device, so you can iterate on the LTV↔CAC ratio for your most valuable cohorts without waiting on a backend.
+              Import customers, campaigns, and spend locally to spot the segments that earn the strongest payback, then act fast on the ratios.
             </p>
             <button type="button" data-testid="open-project-modal" onClick={() => setShowCreateModal(true)}>
               Create new project

@@ -24,6 +24,7 @@ export function ImportWizardScreen() {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const jobs = useLiveQuery(() => db.jobs.orderBy('updatedAt').reverse().limit(5).toArray(), [db])
+  const recentAudit = useLiveQuery(() => db.auditLog.orderBy('ts').reverse().limit(200).toArray(), [db])
   const schema = DATASET_SCHEMAS[dataset]
 
   async function handleFileChange(newFile?: File) {
@@ -51,6 +52,7 @@ export function ImportWizardScreen() {
     }
     setIsRunning(true)
     setError(null)
+    setStatus('Preparing import…')
     try {
       const importJobId = `import-${dataset}-${nanoid(6)}`
       await db.jobs.put({
@@ -68,6 +70,8 @@ export function ImportWizardScreen() {
         (progress) => setStatus(`Importing ${progress.processed}/${progress.total ?? '?'} rows (${progress.phase})`),
       )
       setStatus('Import finished. Recomputing metrics…')
+      setShowMappingModal(false)
+      setCurrentStep(3)
       const computeJobId = `compute-${nanoid(6)}`
       await db.jobs.put({
         jobId: computeJobId,
@@ -83,7 +87,6 @@ export function ImportWizardScreen() {
         (progress) => setStatus(`Compute: ${progress.phase}`),
       )
       setStatus('All data processed!')
-      setCurrentStep(3)
     } catch (err) {
       console.error(err)
       setError(err instanceof Error ? err.message : 'Import failed')
@@ -145,6 +148,37 @@ export function ImportWizardScreen() {
     setCurrentStep(file ? Math.min(currentStep, 2) : 1)
   }
 
+  const datasetCards = useMemo(() => {
+    const auditMap = new Map<string, string>()
+    ;(recentAudit ?? []).forEach((entry) => {
+      if (!auditMap.has(entry.type)) {
+        auditMap.set(entry.type, entry.ts)
+      }
+    })
+    const summaries: Array<{
+      type: DatasetType
+      title: string
+      description: string
+      auditType: string
+      optional?: boolean
+    }> = [
+      { type: 'customers', title: 'Customers', description: 'IDs, acquisition dates, channel hints', auditType: 'IMPORT_CUSTOMERS' },
+      { type: 'transactions', title: 'Transactions', description: 'Revenue amounts per customer', auditType: 'IMPORT_TRANSACTIONS' },
+      { type: 'channels', title: 'Channels', description: 'Channel metadata & budgets', auditType: 'IMPORT_CHANNELS' },
+      { type: 'channelSpendDaily', title: 'Daily spend', description: 'Optional: granular CAC inputs', auditType: 'IMPORT_SPEND', optional: true },
+      { type: 'acquiredVia', title: 'Acquired via', description: 'Optional: explicit channel edges', auditType: 'IMPORT_ACQUIRED_VIA', optional: true },
+    ]
+    return summaries.map((summary) => {
+      const timestamp = auditMap.get(summary.auditType)
+      const formatted = timestamp ? describeLastImport(timestamp) : null
+      return {
+        ...summary,
+        lastImportedLabel: formatted?.label ?? null,
+        isRecentlyUpdated: formatted?.isRecent ?? false,
+      }
+    })
+  }, [recentAudit])
+
   return (
     <div className="import-shell">
       <header className="import-steps-bar">
@@ -178,7 +212,7 @@ export function ImportWizardScreen() {
               refresh ratios without leaving the browser. Every import reruns the pipeline automatically.
             </p>
             {status && !showMappingModal && (
-              <span className="pill" data-testid="import-status">
+              <span className="pill" data-testid="import-status-hero">
                 {status}
               </span>
             )}
@@ -220,6 +254,37 @@ export function ImportWizardScreen() {
               style={{ display: 'none' }}
             />
           </div>
+          <section className="import-status-grid">
+            {datasetCards.map((card) => (
+              <article
+                key={card.type}
+                className={`import-status-card${card.isRecentlyUpdated ? ' highlighted' : ''}`}
+              >
+                <div>
+                  <p className="status-label">
+                    {card.title} {card.optional && <span className="tag optional">Optional</span>}
+                  </p>
+                  <p className="page-description" style={{ margin: '0.2rem 0 0' }}>
+                    {card.description}
+                  </p>
+                  <p className={`status-date${card.isRecentlyUpdated ? ' highlight' : ''}`}>
+                    {card.lastImportedLabel ?? 'Not imported yet'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => {
+                    setDataset(card.type)
+                    triggerFilePicker()
+                  }}
+                >
+                  Import {card.title}
+                </button>
+              </article>
+            ))}
+          </section>
+
           <div className="import-cards-row">
             <div className="import-card">
               <div>
@@ -271,7 +336,7 @@ export function ImportWizardScreen() {
 
       {showMappingModal && (
         <div className="import-modal-backdrop" role="dialog" aria-modal="true">
-          <form className="import-modal" onSubmit={handleSubmit}>
+          <form className="import-modal" data-testid="import-modal" onSubmit={handleSubmit}>
             <div className="import-modal-header">
               <div>
                 <h3>Dataset & mapping</h3>
@@ -408,4 +473,35 @@ function buildAutoMapping(schemaColumns: string[], csvColumns: string[]) {
     }
   })
   return mapping
+}
+
+function describeLastImport(timestamp: string) {
+  const parsed = new Date(timestamp)
+  if (Number.isNaN(parsed.getTime())) {
+    return {
+      label: `Last import: ${timestamp}`,
+      isRecent: false,
+    }
+  }
+  const diffMs = Date.now() - parsed.getTime()
+  if (diffMs < 60_000) {
+    return { label: 'Last import: just now', isRecent: true }
+  }
+  if (diffMs < 3_600_000) {
+    const minutes = Math.round(diffMs / 60_000)
+    return {
+      label: `Last import: ${minutes} min${minutes === 1 ? '' : 's'} ago`,
+      isRecent: false,
+    }
+  }
+  const formatted = parsed.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+  return {
+    label: `Last import: ${formatted}`,
+    isRecent: false,
+  }
 }

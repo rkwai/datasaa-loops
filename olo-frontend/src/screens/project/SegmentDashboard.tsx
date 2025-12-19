@@ -5,6 +5,17 @@ import { useProjectContext } from '../../context/useProjectContext'
 import type { SegmentKey } from '../../db/types'
 import { runComputeJob } from '../../utils/workers'
 
+type KpiTone = 'positive' | 'negative' | 'neutral'
+
+type KpiCard = {
+  label: string
+  value: string
+  change: string
+  tone: KpiTone
+  icon: string
+  testId: string
+}
+
 export function SegmentDashboard() {
   const { db, meta, projectId } = useProjectContext()
   const segmentMetrics = useLiveQuery(() => db.segmentMetrics.toArray(), [db]) ?? []
@@ -79,35 +90,7 @@ export function SegmentDashboard() {
     maximumFractionDigits: 0,
   })
 
-  const kpis = [
-    {
-      label: 'Total customers',
-      value: totalCustomers.toLocaleString(),
-      change: '+12%',
-      tone: 'positive',
-      icon: 'group',
-    },
-    {
-      label: 'Total revenue',
-      value: currencyFormatter.format(totalRevenue),
-      change: '+8%',
-      tone: 'positive',
-      icon: 'payments',
-    },
-    {
-      label: 'Avg LTV',
-      value: currencyFormatter.format(avgLtv),
-      change: '-2%',
-      tone: 'negative',
-      icon: 'loyalty',
-    },
-    {
-      label: 'Top segment',
-      value: topSegment ? `${topSegment.segmentKey}` : '—',
-      change: topSegment ? `${Math.round(topSegment.avgLtv)} avg LTV` : 'Import data to begin',
-      tone: 'neutral',
-      icon: 'pie_chart',
-    },
+  const primaryKpis: KpiCard[] = [
     {
       label: 'LTV : CAC ratio',
       value: Number.isFinite(ltvToCacRatio) ? ltvToCacRatio.toFixed(2) : '—',
@@ -117,11 +100,47 @@ export function SegmentDashboard() {
       testId: 'kpi-ltv-cac',
     },
     {
+      label: 'Top segment',
+      value: topSegment ? `${topSegment.segmentKey}` : '—',
+      change: topSegment ? `${Math.round(topSegment.avgLtv)} avg LTV` : 'Import data to begin',
+      tone: 'neutral',
+      icon: 'pie_chart',
+      testId: 'kpi-top-segment',
+    },
+  ]
+
+  const secondaryKpis: KpiCard[] = [
+    {
+      label: 'Total customers',
+      value: totalCustomers.toLocaleString(),
+      change: '+12%',
+      tone: 'positive',
+      icon: 'group',
+      testId: 'kpi-total-customers',
+    },
+    {
+      label: 'Total revenue',
+      value: currencyFormatter.format(totalRevenue),
+      change: '+8%',
+      tone: 'positive',
+      icon: 'payments',
+      testId: 'kpi-total-revenue',
+    },
+    {
+      label: 'Avg LTV',
+      value: currencyFormatter.format(avgLtv),
+      change: '-2%',
+      tone: 'negative',
+      icon: 'loyalty',
+      testId: 'kpi-avg-ltv',
+    },
+    {
       label: 'Spend captured',
       value: currencyFormatter.format(totalSpend),
       change: healthiestChannel ? `${healthiestChannel.channelId} leading ratio` : 'Awaiting data',
       tone: 'neutral',
       icon: 'bolt',
+      testId: 'kpi-spend-captured',
     },
   ]
 
@@ -132,9 +151,18 @@ export function SegmentDashboard() {
           <div className="dashboard-chip">Analytics</div>
           <h1>Segment overview</h1>
           <p>
-            Visualize how each operational loop contributes to CAC payback. When you see which channels mint high-LTV segments,
-            you know exactly where the blended ratio is healthy — and where it needs help.
+            Know your blended LTV↔CAC and the segments that keep it healthy. Explore the loops driving high-value cohorts, or
+            add data to diagnose new ones.
           </p>
+          {!segmentMetrics.length && !channelMetrics.length && (
+            <button
+              type="button"
+              className="secondary"
+              onClick={() => window.history.replaceState(null, '', '/#/project')}
+            >
+              Import data to start
+            </button>
+          )}
         </div>
         <div className="dashboard-hero-actions">
           <button className="secondary" type="button">
@@ -162,8 +190,25 @@ export function SegmentDashboard() {
         </button>
       </div>
 
-      <section className="dashboard-kpis">
-        {kpis.map((kpi) => (
+      <section className="dashboard-kpis primary-row">
+        {primaryKpis.map((kpi) => (
+          <article
+            key={kpi.label}
+            className={`dashboard-kpi-card tone-${kpi.tone}`}
+            data-testid={kpi.testId}
+          >
+            <div className="kpi-icon">
+              <span className="material-symbols-outlined">{kpi.icon}</span>
+            </div>
+            <p className="kpi-label">{kpi.label}</p>
+            <strong className="kpi-value">{kpi.value}</strong>
+            <span className="kpi-change">{kpi.change}</span>
+          </article>
+        ))}
+      </section>
+
+      <section className="dashboard-kpis secondary-row">
+        {secondaryKpis.map((kpi) => (
           <article
             key={kpi.label}
             className={`dashboard-kpi-card tone-${kpi.tone}`}
